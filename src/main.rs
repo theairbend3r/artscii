@@ -1,15 +1,24 @@
 use std::path::PathBuf;
 
+use clap::Parser;
+
 use image::{imageops::FilterType, open, Luma};
 
 const ASCII: [&str; 14] = [
     "@", "&", "#", "$", "*", "+", "|", "^", "-", ";", ":", "'", ",", ".",
 ];
 
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    #[arg(short, long)]
+    path: PathBuf,
+}
+
 #[derive(Debug)]
 struct Canvas {
-    width: usize,
-    height: usize,
+    width: u32,
+    height: u32,
     aspect_ratio: f32,
 }
 
@@ -19,8 +28,8 @@ impl Canvas {
 
         match terminal_size {
             Ok((width, height)) => {
-                let width: usize = width as usize;
-                let height: usize = height as usize;
+                let width = width as u32;
+                let height = height as u32;
                 let aspect_ratio: f32 = width as f32 / height as f32;
 
                 Canvas {
@@ -41,16 +50,29 @@ impl Canvas {
     }
 }
 
+#[derive(Debug)]
+struct Image {
+    path: PathBuf,
+    width: u32,
+    height: u32,
+}
+
+impl Image {
+    fn new(path: PathBuf) -> Self {
+        let image = open(&path).expect("Image not found.");
+        Image {
+            path,
+            width: image.width(),
+            height: image.height(),
+        }
+    }
+}
+
 // struct Ascii {
 //     width: usize,
 //     height: usize,
 // }
 //
-// struct Image {
-//     path: PathBuf,
-//     width: usize,
-//     height: usize,
-// }
 //
 // fn map_pixel_to_ascii(pixel: &Luma<u8>) -> String {
 //     let Luma([luma_value]) = *pixel;
@@ -60,6 +82,11 @@ impl Canvas {
 // }
 
 fn main() {
+    let args = Args::parse();
+
+    let image = Image::new(args.path);
+    println!("{:?}", image);
+
     let canvas = Canvas::new();
     println!("{:?}", canvas);
 
