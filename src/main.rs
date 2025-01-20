@@ -1,5 +1,5 @@
 use clap::Parser;
-use image::{imageops::FilterType, DynamicImage, ImageBuffer};
+use image::{imageops::FilterType, DynamicImage, ImageBuffer, Luma};
 use std::path::PathBuf;
 
 const ASCII: [&str; 14] = [
@@ -73,25 +73,43 @@ impl Image {
         new_width: u32,
         new_height: u32,
         resize_filter: FilterType,
-    ) -> ImageBuffer<image::Luma<u16>, Vec<u16>> {
+    ) -> ImageBuffer<Luma<u8>, Vec<u8>> {
         self.img
             .resize(new_width, new_height, resize_filter)
-            .into_luma16()
+            .into_luma8()
     }
 }
 
-// struct Ascii {
-//     width: usize,
-//     height: usize,
-// }
-//
-//
-// fn map_pixel_to_ascii(pixel: &Luma<u8>) -> String {
-//     let Luma([luma_value]) = *pixel;
-//     let px: usize = luma_value as usize;
-//     let idx: usize = (px * (ASCII.len() - 1)) / 255;
-//     ASCII[idx].to_string()
-// }
+struct Ascii {
+    width: usize,
+    height: usize,
+    art: Vec<String>,
+}
+
+impl Ascii {
+    fn pixel_to_ascii(px: &Luma<u8>) -> String {
+        let Luma([luma_value]) = *px;
+        let px: usize = luma_value.into();
+        let idx: usize = (px * (ASCII.len() - 1)) / 255;
+        ASCII[idx].to_string()
+    }
+
+    fn img_to_ascii(img: ImageBuffer<Luma<u8>, Vec<u8>>) -> Vec<String> {
+        let mut art = vec![];
+        for (_, _, px) in img.enumerate_pixels() {
+            let ascii_char = Ascii::pixel_to_ascii(px);
+            art.push(ascii_char);
+        }
+
+        art
+    }
+
+    fn display(ascii_art: &[String]) {
+        for chunk in ascii_art.chunks(16) {
+            println!("{:?}", chunk.join(" "));
+        }
+    }
+}
 
 fn main() {
     let args = Args::parse();
@@ -105,26 +123,8 @@ fn main() {
     println!("{:?}", processed_img.height());
     println!("{:?}", processed_img.width());
 
-    // let rgb = open("./../spaceship.png").unwrap();
-    //
-    // let new_height: usize = 32;
-    // let new_width: usize = 32;
-    // let rgb_resized = rgb.resize(
-    //     new_width.try_into().unwrap(),
-    //     new_height.try_into().unwrap(),
-    //     FilterType::Nearest,
-    // );
-    // let gray = rgb_resized.into_luma8();
-    // println!("{:?}", gray);
-    // println!("{:?}", gray.dimensions());
-    //
-    // let mut ascii_img = vec![];
-    // for (_, _, px) in gray.enumerate_pixels() {
-    //     let ascii_val = map_pixel_to_ascii(px);
-    //     ascii_img.push(ascii_val);
-    // }
-    //
-    // for chunk in ascii_img.chunks(new_width) {
-    //     println!("{:?}", chunk.join(" "));
-    // }
+    let art = Ascii::img_to_ascii(processed_img);
+    println!("{:?}", art);
+
+    Ascii::display(&art);
 }
