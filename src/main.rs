@@ -1,37 +1,34 @@
-use image::{imageops::FilterType, open, Luma};
+mod ascii;
+mod canvas;
+mod img;
 
-const ASCII: [&str; 14] = [
-    "@", "&", "#", "$", "*", "+", "|", "^", "-", ";", ":", "'", ",", ".",
-];
+use crate::ascii::Ascii;
+use crate::canvas::Canvas;
+use crate::img::Img;
 
-fn map_pixel_to_ascii(pixel: &Luma<u8>) -> String {
-    let Luma([luma_value]) = *pixel;
-    let px: usize = luma_value as usize;
-    let idx: usize = (px * (ASCII.len() - 1)) / 255;
-    ASCII[idx].to_string()
+use clap::Parser;
+use image::imageops::FilterType;
+use std::path::PathBuf;
+
+#[derive(Parser, Debug)]
+#[command(version, about, long_about = None)]
+struct Args {
+    #[arg(short, long)]
+    path: PathBuf,
 }
 
 fn main() {
-    let rgb = open("./../spaceship.png").unwrap();
+    let args = Args::parse();
 
-    let new_height: usize = 32;
-    let new_width: usize = 32;
-    let rgb_resized = rgb.resize(
-        new_width.try_into().unwrap(),
-        new_height.try_into().unwrap(),
-        FilterType::Nearest,
-    );
-    let gray = rgb_resized.into_luma8();
-    println!("{:?}", gray);
-    println!("{:?}", gray.dimensions());
+    let canvas = Canvas::new();
+    println!("{:?}", canvas);
 
-    let mut ascii_img = vec![];
-    for (_, _, px) in gray.enumerate_pixels() {
-        let ascii_val = map_pixel_to_ascii(px);
-        ascii_img.push(ascii_val);
-    }
+    let img = Img::new(args.path);
+    let processed_img = img.process_img(16, 16, FilterType::Nearest);
+    println!("{:?}", processed_img);
 
-    for chunk in ascii_img.chunks(new_width) {
-        println!("{:?}", chunk.join(" "));
-    }
+    let art = Ascii::img_to_ascii(processed_img);
+    println!("{:?}", art);
+
+    Ascii::display(&art);
 }
