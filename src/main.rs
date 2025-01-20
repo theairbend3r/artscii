@@ -1,8 +1,6 @@
-use std::path::PathBuf;
-
 use clap::Parser;
-
-use image::{imageops::FilterType, open, Luma};
+use image::{imageops::FilterType, DynamicImage, ImageBuffer};
+use std::path::PathBuf;
 
 const ASCII: [&str; 14] = [
     "@", "&", "#", "$", "*", "+", "|", "^", "-", ";", ":", "'", ",", ".",
@@ -55,16 +53,30 @@ struct Image {
     path: PathBuf,
     width: u32,
     height: u32,
+    img: DynamicImage,
 }
 
 impl Image {
     fn new(path: PathBuf) -> Self {
-        let image = open(&path).expect("Image not found.");
+        let img = image::open(&path).expect("Image not found.");
+
         Image {
             path,
-            width: image.width(),
-            height: image.height(),
+            width: img.width(),
+            height: img.height(),
+            img,
         }
+    }
+
+    fn process_img(
+        &self,
+        new_width: u32,
+        new_height: u32,
+        resize_filter: FilterType,
+    ) -> ImageBuffer<image::Luma<u16>, Vec<u16>> {
+        self.img
+            .resize(new_width, new_height, resize_filter)
+            .into_luma16()
     }
 }
 
@@ -84,11 +96,14 @@ impl Image {
 fn main() {
     let args = Args::parse();
 
-    let image = Image::new(args.path);
-    println!("{:?}", image);
-
     let canvas = Canvas::new();
     println!("{:?}", canvas);
+
+    let img = Image::new(args.path);
+    let processed_img = img.process_img(16, 16, FilterType::Nearest);
+    println!("{:?}", processed_img);
+    println!("{:?}", processed_img.height());
+    println!("{:?}", processed_img.width());
 
     // let rgb = open("./../spaceship.png").unwrap();
     //
