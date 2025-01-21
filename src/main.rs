@@ -24,18 +24,13 @@ struct Args {
 }
 
 fn main() {
+    // init structs
     let args = Args::parse();
     let canvas = Canvas::new();
     let img = Img::new(args.path);
 
-    println!(
-        "Canvas: {}, {}, {}",
-        canvas.width, canvas.height, canvas.aspect_ratio
-    );
-    println!("Image: {}, {}, {}", img.width, img.height, img.aspect_ratio);
-
+    // calculate target size for the ascii art
     let mut preserve_aspect_ratio = true;
-
     let (target_width, target_height) = match (args.width, args.height) {
         (Some(width), Some(height)) => {
             preserve_aspect_ratio = false;
@@ -46,26 +41,15 @@ fn main() {
         (None, None) => (canvas.width, canvas.height),
     };
 
+    // resize image and convert to grayscale
     let processed_img = img.process_img(
         target_width,
         target_height,
         preserve_aspect_ratio,
         FilterType::Lanczos3,
     );
-    println!(
-        "Processed Img: {}, {}, {}",
-        processed_img.width(),
-        processed_img.height(),
-        processed_img.width() / processed_img.height()
-    );
 
+    // convert image pixels to ascii chars
     let ascii = Ascii::img_to_ascii(processed_img);
-    println!(
-        "{}, {}, {}",
-        ascii.width,
-        ascii.height,
-        (ascii.width / ascii.height) as f32
-    );
-
     Ascii::display(ascii);
 }
