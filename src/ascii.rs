@@ -1,13 +1,13 @@
 use image::{ImageBuffer, Luma};
 
-const ASCII: [&str; 14] = [
-    "@", "&", "#", "$", "*", "+", "|", "^", "-", ";", ":", "'", ",", ".",
+const ASCII: [&str; 15] = [
+    "@", "&", "#", "$", "*", "+", "|", "^", "-", ";", ":", "'", ",", ".", " ",
 ];
 
 pub struct Ascii {
-    width: usize,
-    height: usize,
-    art: Vec<String>,
+    pub width: u32,
+    pub height: u32,
+    pub art: Vec<Vec<String>>,
 }
 
 impl Ascii {
@@ -18,19 +18,26 @@ impl Ascii {
         ASCII[idx].to_string()
     }
 
-    pub fn img_to_ascii(img: ImageBuffer<Luma<u8>, Vec<u8>>) -> Vec<String> {
-        let mut art = vec![];
-        for (_, _, px) in img.enumerate_pixels() {
-            let ascii_char = Ascii::pixel_to_ascii(px);
-            art.push(ascii_char);
+    pub fn img_to_ascii(img: ImageBuffer<Luma<u8>, Vec<u8>>) -> Ascii {
+        let width = img.width() as usize;
+        let height = img.height() as usize;
+        let mut art = vec![vec![" ".to_string(); width]; height];
+
+        for (y, x, p) in img.enumerate_pixels() {
+            let ascii_char = Ascii::pixel_to_ascii(p);
+            art[x as usize][y as usize] = ascii_char;
         }
 
-        art
+        Ascii {
+            width: img.width(),
+            height: img.height(),
+            art,
+        }
     }
 
-    pub fn display(ascii_art: &[String]) {
-        for chunk in ascii_art.chunks(16) {
-            println!("{:?}", chunk.join(" "));
+    pub fn display(ascii: Ascii) {
+        for row in ascii.art {
+            println!("{}", row.join(" "));
         }
     }
 }

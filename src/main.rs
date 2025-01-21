@@ -15,20 +15,41 @@ use std::path::PathBuf;
 struct Args {
     #[arg(short, long)]
     path: PathBuf,
+
+    #[arg(long)]
+    width: Option<u32>,
+
+    #[arg(long)]
+    height: Option<u32>,
 }
 
 fn main() {
+    // init structs
     let args = Args::parse();
-
     let canvas = Canvas::new();
-    println!("{:?}", canvas);
-
     let img = Img::new(args.path);
-    let processed_img = img.process_img(16, 16, FilterType::Nearest);
-    println!("{:?}", processed_img);
 
-    let art = Ascii::img_to_ascii(processed_img);
-    println!("{:?}", art);
+    // calculate target size for the ascii art
+    let mut preserve_aspect_ratio = true;
+    let (target_width, target_height) = match (args.width, args.height) {
+        (Some(width), Some(height)) => {
+            preserve_aspect_ratio = false;
+            (width, height)
+        }
+        (Some(width), None) => (width, img.height),
+        (None, Some(height)) => (img.width, height),
+        (None, None) => (canvas.width, canvas.height),
+    };
 
-    Ascii::display(&art);
+    // resize image and convert to grayscale
+    let processed_img = img.process_img(
+        target_width,
+        target_height,
+        preserve_aspect_ratio,
+        FilterType::Lanczos3,
+    );
+
+    // convert image pixels to ascii chars
+    let ascii = Ascii::img_to_ascii(processed_img);
+    Ascii::display(ascii);
 }
