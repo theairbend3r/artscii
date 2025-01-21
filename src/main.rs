@@ -32,7 +32,12 @@ fn main() {
     );
     println!("Image: {}, {}, {}", img.width, img.height, img.aspect_ratio);
 
-    let processed_img = img.process_img(canvas.width, canvas.height, FilterType::Lanczos3);
+    let (target_width, target_height) = match args.width {
+        Some(width) => (width, img.height),
+        None => (canvas.width, canvas.height),
+    };
+
+    let processed_img = img.process_img(target_width, target_height, FilterType::Lanczos3);
     println!(
         "Processed Img: {}, {}, {}",
         processed_img.width(),
