@@ -8,7 +8,6 @@ use crate::img::Img;
 
 use clap::Parser;
 use image::imageops::FilterType;
-use std::cmp::min;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
@@ -17,8 +16,11 @@ struct Args {
     #[arg(short, long)]
     path: PathBuf,
 
-    #[arg(short, long)]
+    #[arg(long)]
     width: Option<u32>,
+
+    #[arg(long)]
+    height: Option<u32>,
 }
 
 fn main() {
@@ -32,12 +34,24 @@ fn main() {
     );
     println!("Image: {}, {}, {}", img.width, img.height, img.aspect_ratio);
 
-    let (target_width, target_height) = match args.width {
-        Some(width) => (width, img.height),
-        None => (canvas.width, canvas.height),
+    let mut preserve_aspect_ratio = true;
+
+    let (target_width, target_height) = match (args.width, args.height) {
+        (Some(width), Some(height)) => {
+            preserve_aspect_ratio = false;
+            (width, height)
+        }
+        (Some(width), None) => (width, img.height),
+        (None, Some(height)) => (img.width, height),
+        (None, None) => (canvas.width, canvas.height),
     };
 
-    let processed_img = img.process_img(target_width, target_height, FilterType::Lanczos3);
+    let processed_img = img.process_img(
+        target_width,
+        target_height,
+        preserve_aspect_ratio,
+        FilterType::Lanczos3,
+    );
     println!(
         "Processed Img: {}, {}, {}",
         processed_img.width(),

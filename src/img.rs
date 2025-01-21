@@ -28,10 +28,17 @@ impl Img {
         &self,
         new_width: u32,
         new_height: u32,
+        preserve_aspect_ratio: bool,
         resize_filter: FilterType,
     ) -> ImageBuffer<Luma<u8>, Vec<u8>> {
-        self.img
-            .resize(new_width, new_height, resize_filter)
-            .into_luma8()
+        if preserve_aspect_ratio {
+            self.img
+                .resize(new_width, new_height, resize_filter)
+                .into_luma8()
+        } else {
+            self.img
+                .resize_exact(new_width, new_height, resize_filter)
+                .into_luma8()
+        }
     }
 }
