@@ -8,6 +8,7 @@ use crate::img::Img;
 
 use clap::Parser;
 use image::imageops::FilterType;
+use std::cmp::min;
 use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
@@ -15,20 +16,37 @@ use std::path::PathBuf;
 struct Args {
     #[arg(short, long)]
     path: PathBuf,
+
+    #[arg(short, long)]
+    width: Option<u32>,
 }
 
 fn main() {
     let args = Args::parse();
-
     let canvas = Canvas::new();
-    println!("{:?}", canvas);
-
     let img = Img::new(args.path);
-    let processed_img = img.process_img(16, 16, FilterType::Nearest);
-    println!("{:?}", processed_img);
 
-    let art = Ascii::img_to_ascii(processed_img);
-    println!("{:?}", art);
+    println!(
+        "Canvas: {}, {}, {}",
+        canvas.width, canvas.height, canvas.aspect_ratio
+    );
+    println!("Image: {}, {}, {}", img.width, img.height, img.aspect_ratio);
 
-    Ascii::display(&art);
+    let processed_img = img.process_img(canvas.width, canvas.height, FilterType::Lanczos3);
+    println!(
+        "Processed Img: {}, {}, {}",
+        processed_img.width(),
+        processed_img.height(),
+        processed_img.width() / processed_img.height()
+    );
+
+    let ascii = Ascii::img_to_ascii(processed_img);
+    println!(
+        "{}, {}, {}",
+        ascii.width,
+        ascii.height,
+        (ascii.width / ascii.height) as f32
+    );
+
+    Ascii::display(ascii);
 }

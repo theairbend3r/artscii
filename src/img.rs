@@ -1,22 +1,25 @@
-use std::path::PathBuf;
 use image::{imageops::FilterType, DynamicImage, ImageBuffer, Luma};
+use std::path::PathBuf;
 
 #[derive(Debug)]
 pub struct Img {
     path: PathBuf,
-    width: u32,
-    height: u32,
+    pub width: u32,
+    pub height: u32,
+    pub aspect_ratio: f32,
     img: DynamicImage,
 }
 
 impl Img {
     pub fn new(path: PathBuf) -> Self {
         let img = image::open(&path).expect("Image not found.");
+        let aspect_ratio = img.width() as f32 / img.height() as f32;
 
         Img {
             path,
             width: img.width(),
             height: img.height(),
+            aspect_ratio,
             img,
         }
     }

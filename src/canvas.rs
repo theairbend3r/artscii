@@ -1,8 +1,8 @@
 #[derive(Debug)]
 pub struct Canvas {
-    width: u32,
-    height: u32,
-    aspect_ratio: f32,
+    pub width: u32,
+    pub height: u32,
+    pub aspect_ratio: f32,
 }
 
 impl Canvas {
@@ -11,9 +11,9 @@ impl Canvas {
 
         match terminal_size {
             Ok((width, height)) => {
-                let width = width as u32;
-                let height = height as u32;
-                let aspect_ratio: f32 = width as f32 / height as f32;
+                let width = width as u32 - 2;
+                let height = height as u32 - 2;
+                let aspect_ratio = width as f32 / height as f32;
 
                 Canvas {
                     width,
