@@ -53,12 +53,18 @@ enum MediaType {
     Video
 }
 
+enum MediaColour {
+    Gray,
+    Colour
+}
+
 Frames {
     path: PathBuf,
     width: u32,
     height: u32,
     aspect_ratio: f32,
-    mediaType: MediaType,
+    media_type: MediaType,
+    media_colour: MediaColour,
     frames: Vec<DynamicImage>, // vector will have only 1 item if it's an image
 }
 ```
@@ -70,7 +76,7 @@ Input media is loaded into the structs above.
 ```rust
 enum AsciiColourType {
     Gray,
-    Rgb
+    Colour
 }
 
 enum AsciiCharType {
@@ -103,3 +109,64 @@ struct Canvas {
 
 The Canvas struct is used to store the terminal size --- helpful for setting a
 maximum size on the ASCII image.
+
+## Program Flow
+
+```rust
+
+// user runs command with args
+// path
+// height/width
+// colour
+// invert
+// chars
+read_args();
+
+
+// read image/video and store in the Frame struct
+// Frames {
+//     path: PathBuf,
+//     width: u32,
+//     height: u32,
+//     aspect_ratio: f32,
+//     mediaType: MediaType,
+//     frames: Vec<DynamicImage>,
+// }
+read_media();
+
+
+// get terminal size to set a max limit on frame size
+// target_width, target_height
+terminal_size();
+
+
+// returns a new Frames struct with updated information
+// especially for the new size
+process_media();
+    // resize to max(canvas_size, user_input_size)
+    resize_media();
+
+    // either convert to grayscale or keep it coloured per user input
+    if user_prefers_gray {
+        convert_to_gray();
+    }
+
+
+// convert to ascii
+pixel_to_ascii();
+    pick_ascii_chars();
+    coloured_vs_grayscale();
+
+
+// display ascii on terminal
+print_ascii();
+    if frames.len() == 1 {
+        print(f);
+
+    } else {
+        for f in frames {
+            print(f);
+            clear_terminal();
+        }
+    }
+```
