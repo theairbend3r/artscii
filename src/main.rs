@@ -1,10 +1,10 @@
 mod ascii;
 mod canvas;
-mod img;
+mod media;
 
 use crate::ascii::Ascii;
 use crate::canvas::Canvas;
-use crate::img::Img;
+use crate::media::Media;
 
 use clap::Parser;
 use image::imageops::FilterType;
@@ -27,7 +27,7 @@ fn main() {
     // init structs
     let args = Args::parse();
     let canvas = Canvas::new();
-    let img = Img::new(args.path);
+    let media = Media::new(args.path);
 
     // calculate target size for the ascii art
     let mut preserve_aspect_ratio = true;
@@ -36,13 +36,13 @@ fn main() {
             preserve_aspect_ratio = false;
             (width, height)
         }
-        (Some(width), None) => (width, img.height),
-        (None, Some(height)) => (img.width, height),
+        (Some(width), None) => (width, media.height),
+        (None, Some(height)) => (media.width, height),
         (None, None) => (canvas.width, canvas.height),
     };
 
     // resize image and convert to grayscale
-    let processed_img = img.process_img(
+    let processed_img = media.process_img(
         target_width,
         target_height,
         preserve_aspect_ratio,
