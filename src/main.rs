@@ -1,4 +1,9 @@
-use std::{fs::read_dir, path::PathBuf, thread, time::Duration};
+use std::{
+    fs::read_dir,
+    path::{Path, PathBuf},
+    thread,
+    time::Duration,
+};
 
 use clap::Parser;
 use image::{DynamicImage, GenericImageView, ImageReader};
@@ -69,7 +74,7 @@ impl Frames {
     }
 }
 
-fn is_image_file(path: &PathBuf) -> bool {
+fn is_image_file(path: &Path) -> bool {
     match path.extension() {
         Some(ext) => ["png", "jpg", "jpeg"].contains(&ext.to_str().unwrap()),
         None => false,
