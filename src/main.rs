@@ -1,4 +1,4 @@
-use image::{GenericImageView, ImageReader};
+use image::{DynamicImage, GenericImageView, ImageReader};
 use std::{thread, time::Duration};
 
 const ASCII_CHARS: &[char] = &['@', '#', '8', '&', 'o', ':', '*', '.', ' '];
@@ -13,10 +13,13 @@ struct Frames {
     data: Vec<Frame>,
 }
 
+fn read_image(file_path: &str) -> DynamicImage {
+    let img_reader = ImageReader::open(file_path).expect("No file found.");
+    img_reader.decode().expect("Could not open image.")
+}
+
 impl Frame {
-    fn new(file_path: &str) -> Self {
-        let img_reader = ImageReader::open(file_path).expect("No file found.");
-        let img = img_reader.decode().expect("Could not open image.");
+    fn from_image(img: DynamicImage) -> Self {
         let (width, height) = img.dimensions();
 
         let img = img
@@ -36,7 +39,7 @@ impl Frame {
         Self { data: arr }
     }
 
-    fn convert_to_ascii(pixel: u8) -> char {
+    fn pixel_to_ascii(pixel: u8) -> char {
         let ascii_idx = pixel as usize * (ASCII_CHARS.len() - 1) / 255;
         ASCII_CHARS[ascii_idx]
     }
@@ -44,7 +47,7 @@ impl Frame {
     fn render(self) {
         for row in self.data {
             for col in row {
-                print!("{}", Self::convert_to_ascii(col));
+                print!("{}", Self::pixel_to_ascii(col));
                 // print!("{:4?}", col);
             }
             println!()
@@ -75,7 +78,8 @@ fn main() {
     let mut frames = Frames { data: vec![] };
 
     for fp in file_paths {
-        let frame = Frame::new(fp);
+        let img = read_image(fp);
+        let frame = Frame::from_image(img);
         frames.data.push(frame)
     }
 
