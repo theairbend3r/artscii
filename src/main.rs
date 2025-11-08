@@ -1,5 +1,7 @@
+use std::{fs::read_dir, path::PathBuf, thread, time::Duration};
+
+use clap::Parser;
 use image::{DynamicImage, GenericImageView, ImageReader};
-use std::{thread, time::Duration};
 
 const ASCII_CHARS: &[char] = &['@', '#', '8', '&', 'o', ':', '*', '.', ' '];
 
@@ -13,7 +15,7 @@ struct Frames {
     data: Vec<Frame>,
 }
 
-fn read_image(file_path: &str) -> DynamicImage {
+fn read_image(file_path: &PathBuf) -> DynamicImage {
     let img_reader = ImageReader::open(file_path).expect("No file found.");
     img_reader.decode().expect("Could not open image.")
 }
@@ -67,21 +69,48 @@ impl Frames {
     }
 }
 
-fn main() {
-    let file_paths = vec![
-        "./../1.png",
-        "./../10006.png",
-        "./../10009.png",
-        "./../10002.png",
-    ];
-
-    let mut frames = Frames { data: vec![] };
-
-    for fp in file_paths {
-        let img = read_image(fp);
-        let frame = Frame::from_image(img);
-        frames.data.push(frame)
+fn is_image_file(path: &PathBuf) -> bool {
+    match path.extension() {
+        Some(ext) => ["png", "jpg", "jpeg"].contains(&ext.to_str().unwrap()),
+        None => false,
     }
+}
 
-    frames.render();
+/// path to image to display or directory of images to animate"
+#[derive(Parser, Debug)]
+struct Args {
+    #[arg(short, long, help = "path to file or dir.")]
+    path: PathBuf,
+}
+
+fn main() {
+    let args = Args::parse();
+
+    if args.path.is_dir() {
+        let paths = read_dir(args.path).unwrap();
+        let mut image_files: Vec<PathBuf> = vec![];
+
+        for path in paths {
+            image_files.push(path.unwrap().path());
+        }
+        let mut frames = Frames { data: vec![] };
+
+        for fp in image_files {
+            let img = read_image(&fp);
+            let frame = Frame::from_image(img);
+            frames.data.push(frame)
+        }
+
+        frames.render();
+    } else if args.path.is_file() {
+        if is_image_file(&args.path) {
+            let img = read_image(&args.path);
+            let frame = Frame::from_image(img);
+            frame.render();
+        } else {
+            println!("Image file not supported.")
+        }
+    } else {
+        println!("Could not find path.");
+    }
 }
