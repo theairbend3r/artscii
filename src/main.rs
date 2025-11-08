@@ -44,8 +44,8 @@ impl Frame {
     fn render(self) {
         for row in self.data {
             for col in row {
-                // print!("{}", Self::convert_to_ascii(col));
-                print!("{:4?}", col);
+                print!("{}", Self::convert_to_ascii(col));
+                // print!("{:4?}", col);
             }
             println!()
         }
