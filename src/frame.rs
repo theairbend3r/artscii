@@ -5,13 +5,13 @@ pub struct Frame {
     image: DynamicImage,
     width: u32,
     height: u32,
-    ascii_chars: String,
+    ascii_chars: Vec<char>,
 }
 
 impl Frame {
     pub fn from_path(path: &PathBuf) -> Self {
         let img = image::open(path).expect("Failed to open image.");
-        let ascii_chars = "@%#*+=-:. ".to_string();
+        let ascii_chars: Vec<char> = vec!['@', '%', '#', '*', '+', '=', '-', ':', '.', ' '];
 
         //  terminal characters are approx twice as high as they are wide
         let img_resized = img.resize(
@@ -22,7 +22,6 @@ impl Frame {
 
         let img_gray = img_resized.grayscale();
         let (width, height) = img_gray.dimensions();
-        // let img_gray = img_resized.to_luma8();
 
         Self {
             image: img_gray,
@@ -32,7 +31,12 @@ impl Frame {
         }
     }
 
-    pub fn render(&self) {
+    pub fn to_ascii(&self) -> Vec<char> {
+        // store the ascii image in a single list periodically
+        // separated by newlines.
+        let mut ascii_image: Vec<char> =
+            Vec::with_capacity((self.width * self.height) as usize + self.height as usize);
+
         for y in 0..self.height {
             for x in 0..self.width {
                 let pixel = self.image.get_pixel(x, y);
@@ -41,11 +45,12 @@ impl Frame {
                 // multiply first and divide later because in rust
                 // dividing two integers results in an integer which throws away the decimal.
                 let ascii_idx = brightness * (self.ascii_chars.len() - 1) / 255;
-                let ascii_char = self.ascii_chars.chars().nth(ascii_idx).unwrap();
+                let ascii_char = self.ascii_chars[ascii_idx];
 
-                print!("{}", ascii_char);
+                ascii_image.push(ascii_char);
             }
-            println!();
+            ascii_image.push('\n');
         }
+        ascii_image
     }
 }

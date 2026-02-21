@@ -16,5 +16,8 @@ fn main() {
     println!("Path provided: {:?}", args.path);
 
     let frame = Frame::from_path(&args.path);
-    frame.render();
+    let artscii = frame.to_ascii();
+    for c in artscii {
+        print!("{}", c)
+    }
 }
