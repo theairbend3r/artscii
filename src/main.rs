@@ -1,63 +1,55 @@
-mod frame;
-mod frames;
-
-use crate::frame::Frame;
-use crate::frames::Frames;
-
-use std::{
-    fs::read_dir,
-    path::{Path, PathBuf},
-};
-
 use clap::Parser;
-use image::{DynamicImage, ImageReader};
+use std::path::PathBuf;
 
-fn read_image(file_path: &PathBuf) -> DynamicImage {
-    let img_reader = ImageReader::open(file_path).expect("No file found.");
-    img_reader.decode().expect("Could not open image.")
-}
-fn is_image_file(path: &Path) -> bool {
-    match path.extension() {
-        Some(ext) => ["png", "jpg", "jpeg"].contains(&ext.to_str().unwrap()),
-        None => false,
-    }
-}
-
-/// path to image to display or directory of images to animate
 #[derive(Parser, Debug)]
 struct Args {
-    #[arg(short, long, help = "path to file or dir.")]
+    #[arg(short, long)]
     path: PathBuf,
 }
 
 fn main() {
     let args = Args::parse();
 
-    if args.path.is_dir() {
-        let paths = read_dir(args.path).unwrap();
-        let mut image_files: Vec<PathBuf> = vec![];
+    let ascii_chars = "@%#*+=-:. ";
 
-        for path in paths {
-            image_files.push(path.unwrap().path());
-        }
-        let mut frames = Frames { data: vec![] };
+    let img = image::open(&args.path).expect("Failed to open image.");
 
-        for fp in image_files {
-            let img = read_image(&fp);
-            let frame = Frame::from_image(img);
-            frames.data.push(frame)
-        }
+    //  terminal characters are approx twice as high as they are wide
+    let img_resized = img.resize(
+        img.width(),
+        img.width() / 2,
+        image::imageops::FilterType::Nearest,
+    );
 
-        frames.render();
-    } else if args.path.is_file() {
-        if is_image_file(&args.path) {
-            let img = read_image(&args.path);
-            let frame = Frame::from_image(img);
-            frame.render();
-        } else {
-            println!("Image file not supported.")
+    // let img_gray = img_resized.grayscale();
+    let img_gray = img_resized.to_luma8();
+
+    println!("Path provided: {:?}", args.path);
+    println!("Ascii chars: {:?}", ascii_chars);
+    println!("Loaded image: {}x{}", img.width(), img.height());
+    println!(
+        "Resized image: {}x{}",
+        img_resized.width(),
+        img_resized.height()
+    );
+    println!(
+        "Grayscale image: {}x{}",
+        img_gray.width(),
+        img_gray.height()
+    );
+
+    for y in 0..img_gray.height() {
+        for x in 0..img_gray.width() {
+            let pixel = img_gray.get_pixel(x, y);
+            let brightness = pixel[0] as usize;
+
+            // multiply first and divide later because in rust
+            // dividing two integers results in an integer which throws away the decimal.
+            let ascii_idx = brightness * (ascii_chars.len() - 1) / 255;
+            let ascii_char = ascii_chars.chars().nth(ascii_idx).unwrap();
+
+            print!("{}", ascii_char);
         }
-    } else {
-        println!("Could not find path.");
+        println!();
     }
 }
