@@ -18,6 +18,9 @@ fn main() {
     let args = Args::parse();
     println!("Path provided: {:?}", args.path);
 
+    let (w, h) = get_terminal_size();
+    println!("{:?}, {:?}", w, h);
+
     let frame = Frame::from_path(&args.path);
     let artscii = frame.to_ascii();
     for c in artscii {
