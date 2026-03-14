@@ -1,9 +1,12 @@
 mod frame;
+mod utils;
 
 use frame::Frame;
 
 use clap::Parser;
 use std::path::PathBuf;
+
+use crate::utils::get_terminal_size;
 
 #[derive(Parser, Debug)]
 struct Args {
