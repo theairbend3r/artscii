@@ -14,9 +14,9 @@ impl Frame {
         let ascii_chars: Vec<char> = vec!['@', '%', '#', '*', '+', '=', '-', ':', '.', ' '];
 
         //  terminal characters are approx twice as high as they are wide
-        let img_resized = img.resize(
+        let img_resized = img.resize_exact(
             img.width(),
-            img.width() / 2,
+            img.height() / 2,
             image::imageops::FilterType::Nearest,
         );
 
