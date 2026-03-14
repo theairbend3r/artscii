@@ -1,4 +1,4 @@
-use image::{ColorType, DynamicImage, GenericImageView};
+use image::{DynamicImage, GenericImageView};
 use std::path::PathBuf;
 
 use crate::utils::get_terminal_size;
@@ -14,7 +14,6 @@ pub struct Frame {
 impl Frame {
     pub fn from_path(path: &PathBuf) -> Self {
         let img = Self::load(path);
-
         let img = Self::resize(img);
         let img = Self::colorise(img);
 
@@ -56,10 +55,29 @@ impl Frame {
     pub fn to_ascii(&self) -> Vec<char> {
         // store the ascii image in a single list periodically
         // separated by newlines.
+        let (ascii_w, ascii_h) = (self.width, self.height);
+        let (term_w, term_h) = get_terminal_size();
+
+        let pad_top = ((term_h as i32 - ascii_h as i32) / 2).max(0) as u32;
+        let pad_left = ((term_w as i32 - ascii_w as i32) / 2).max(0) as u32;
+
+        // include padding in new width on one side
+        let new_width = self.width + pad_left;
+
+        // init finall ascii 2d matrix as a 1d vector
         let mut ascii_image: Vec<char> =
-            Vec::with_capacity((self.width * self.height) as usize + self.height as usize);
+            Vec::with_capacity((new_width * self.height) as usize + self.height as usize);
+
+        // pad top
+        for _ in 0..pad_top {
+            println!();
+        }
 
         for y in 0..self.height {
+            // fill with padding
+            ascii_image.extend(std::iter::repeat_n(' ', pad_left as usize));
+
+            // fill with ascii chars
             for x in 0..self.width {
                 let pixel = self.image.get_pixel(x, y);
                 let brightness = pixel[0] as usize;

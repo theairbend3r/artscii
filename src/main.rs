@@ -6,8 +6,6 @@ use frame::Frame;
 use clap::Parser;
 use std::path::PathBuf;
 
-use crate::utils::get_terminal_size;
-
 #[derive(Parser, Debug)]
 struct Args {
     #[arg(short, long)]
@@ -16,10 +14,6 @@ struct Args {
 
 fn main() {
     let args = Args::parse();
-    println!("Path provided: {:?}", args.path);
-
-    let (w, h) = get_terminal_size();
-    println!("{:?}, {:?}", w, h);
 
     let frame = Frame::from_path(&args.path);
     let artscii = frame.to_ascii();
