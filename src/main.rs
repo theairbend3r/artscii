@@ -4,7 +4,7 @@ mod utils;
 use frame::Frame;
 
 use clap::Parser;
-use std::path::PathBuf;
+use std::{error::Error, path::PathBuf};
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -12,12 +12,14 @@ struct Args {
     path: PathBuf,
 }
 
-fn main() {
+fn main() -> Result<(), Box<dyn Error>> {
     let args = Args::parse();
 
-    let frame = Frame::from_path(&args.path);
+    let frame = Frame::from_path(&args.path)?;
     let artscii = frame.to_ascii();
     for c in artscii {
         print!("{}", c)
     }
+
+    Ok(())
 }
