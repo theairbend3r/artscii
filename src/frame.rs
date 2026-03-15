@@ -13,8 +13,7 @@ pub struct Frame {
 
 impl Frame {
     pub fn from_path(path: &PathBuf) -> Result<Self, Box<dyn Error>> {
-        let img =
-            Self::load(path).map_err(|e| format!("Error reading `{}`: {}", path.display(), e))?;
+        let img = Self::load(path)?;
 
         let img = Self::resize(img);
         let img = Self::colorise(img);
@@ -29,7 +28,9 @@ impl Frame {
     }
 
     fn load(path: &PathBuf) -> Result<DynamicImage, Box<dyn Error>> {
-        Ok(image::open(path)?)
+        let img =
+            image::open(path).map_err(|e| format!("Error reading `{}`: {}", path.display(), e))?;
+        Ok(img)
     }
 
     fn resize(img: DynamicImage) -> DynamicImage {
