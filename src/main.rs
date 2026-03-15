@@ -1,6 +1,7 @@
 mod frame;
 mod utils;
 
+use anyhow::Result;
 use frame::Frame;
 
 use clap::Parser;
@@ -12,12 +13,12 @@ struct Args {
     path: PathBuf,
 }
 
-fn main() {
+fn main() -> Result<()> {
     let args = Args::parse();
 
-    let frame = Frame::from_path(&args.path);
-    let artscii = frame.to_ascii();
-    for c in artscii {
-        print!("{}", c)
-    }
+    let frame = Frame::from_path(&args.path)?;
+
+    frame.render();
+
+    Ok(())
 }
