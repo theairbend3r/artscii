@@ -1,5 +1,6 @@
+use anyhow::{Context, Result};
 use image::{DynamicImage, GenericImageView};
-use std::{error::Error, path::PathBuf};
+use std::path::PathBuf;
 
 use crate::utils::get_terminal_size;
 
@@ -12,7 +13,7 @@ pub struct Frame {
 }
 
 impl Frame {
-    pub fn from_path(path: &PathBuf) -> Result<Self, Box<dyn Error>> {
+    pub fn from_path(path: &PathBuf) -> Result<Self> {
         let img = Self::load(path)?;
 
         let img = Self::resize(img);
@@ -27,10 +28,8 @@ impl Frame {
         })
     }
 
-    fn load(path: &PathBuf) -> Result<DynamicImage, Box<dyn Error>> {
-        let img =
-            image::open(path).map_err(|e| format!("Error reading `{}`: {}", path.display(), e))?;
-        Ok(img)
+    fn load(path: &PathBuf) -> Result<DynamicImage> {
+        image::open(path).with_context(|| format!("Failed to read file: `{}`", path.display()))
     }
 
     fn resize(img: DynamicImage) -> DynamicImage {

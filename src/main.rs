@@ -1,10 +1,11 @@
 mod frame;
 mod utils;
 
+use anyhow::Result;
 use frame::Frame;
 
 use clap::Parser;
-use std::{error::Error, path::PathBuf};
+use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 struct Args {
@@ -12,7 +13,7 @@ struct Args {
     path: PathBuf,
 }
 
-fn main() -> Result<(), Box<dyn Error>> {
+fn main() -> Result<()> {
     let args = Args::parse();
 
     let frame = Frame::from_path(&args.path)?;
