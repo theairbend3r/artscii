@@ -96,4 +96,11 @@ impl Frame {
         }
         ascii_image
     }
+
+    pub fn render(&self) {
+        let artscii = self.to_ascii();
+        for c in artscii {
+            print!("{}", c)
+        }
+    }
 }

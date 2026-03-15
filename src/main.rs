@@ -17,10 +17,8 @@ fn main() -> Result<()> {
     let args = Args::parse();
 
     let frame = Frame::from_path(&args.path)?;
-    let artscii = frame.to_ascii();
-    for c in artscii {
-        print!("{}", c)
-    }
+
+    frame.render();
 
     Ok(())
 }
