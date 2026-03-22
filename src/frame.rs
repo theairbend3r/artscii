@@ -59,6 +59,11 @@ impl Frame {
         img.grayscale()
     }
 
+    fn brightness_to_ascii_char(brightness: usize) -> char {
+        let ascii_idx = brightness * (ASCII_CHARS.len() - 1) / 255;
+        ASCII_CHARS[ascii_idx]
+    }
+
     pub fn to_ascii(&self) -> Vec<char> {
         info!("Converting frame to a vector of ascii chars.");
         // store the ascii image in a single list periodically
@@ -92,8 +97,7 @@ impl Frame {
 
                 // multiply first and divide later because in rust
                 // dividing two integers results in an integer which throws away the decimal.
-                let ascii_idx = brightness * (ASCII_CHARS.len() - 1) / 255;
-                let ascii_char = ASCII_CHARS[ascii_idx];
+                let ascii_char = Self::brightness_to_ascii_char(brightness);
 
                 ascii_image.push(ascii_char);
             }
