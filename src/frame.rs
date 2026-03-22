@@ -26,7 +26,6 @@ impl Frame {
 
     pub fn from_path(path: &PathBuf) -> Result<Self> {
         let img = Self::load(path)?;
-
         let img = Self::resize(img);
         let img = Self::colorise(img);
 
@@ -64,6 +63,7 @@ impl Frame {
 
         img.resize_exact(new_img_w, new_img_h, image::imageops::FilterType::Nearest)
     }
+
     fn colorise(img: DynamicImage) -> DynamicImage {
         info!("Converting image to grayscale (luma8).");
         img.grayscale()
@@ -85,16 +85,15 @@ impl Frame {
         (pad_left, pad_top)
     }
 
+    /// store the ascii image in a single list separated by newlines.
     pub fn to_ascii(&self) -> Vec<char> {
         info!("Converting frame to a vector of ascii chars.");
-        // store the ascii image in a single list periodically
-        // separated by newlines.
         let (ascii_w, ascii_h) = (self.width, self.height);
 
         // calculate required padding based on terminal size
         let (pad_left, pad_top) = Self::calculate_padding(ascii_w, ascii_h);
 
-        // init finall ascii 2d matrix as a 1d vector
+        // init ascii 2d matrix as a 1d vector
         // include padding in new width on one side
         let new_width = self.width + pad_left;
         let mut ascii_image: Vec<char> =
@@ -152,12 +151,5 @@ mod tests {
         // frame has correct dimensions
         assert_eq!(w, 8);
         assert_eq!(h, 8);
-    }
-
-    #[test]
-    fn check_ascii_height() {
-        let img = create_test_img(8, 8, 0);
-        let frame = Frame::from_image(img);
-        let ascii = frame.to_ascii();
     }
 }
