@@ -1,5 +1,6 @@
 use anyhow::{Context, Result};
 use image::{DynamicImage, GenericImageView};
+use log::info;
 use std::path::PathBuf;
 
 use crate::utils::get_terminal_size;
@@ -29,10 +30,12 @@ impl Frame {
     }
 
     fn load(path: &PathBuf) -> Result<DynamicImage> {
+        info!("Loading image from disk as a frame.");
         image::open(path).with_context(|| format!("Failed to read file: `{}`", path.display()))
     }
 
     fn resize(img: DynamicImage) -> DynamicImage {
+        info!("Resizing frame.");
         let (img_w, img_h) = img.dimensions();
         let (term_w, term_h) = get_terminal_size();
 
@@ -52,10 +55,12 @@ impl Frame {
         img.resize_exact(new_img_w, new_img_h, image::imageops::FilterType::Nearest)
     }
     fn colorise(img: DynamicImage) -> DynamicImage {
+        info!("Colourising frame.");
         img.grayscale()
     }
 
     pub fn to_ascii(&self) -> Vec<char> {
+        info!("Converting frame to a vector of ascii chars.");
         // store the ascii image in a single list periodically
         // separated by newlines.
         let (ascii_w, ascii_h) = (self.width, self.height);
@@ -99,6 +104,7 @@ impl Frame {
 
     pub fn render(&self) {
         let artscii = self.to_ascii();
+        info!("Printing the computed vector of ascii characters.");
         for c in artscii {
             print!("{}", c)
         }
