@@ -14,9 +14,18 @@ pub struct Frame {
 }
 
 impl Frame {
+    #[cfg(test)]
+    fn from_image(img: DynamicImage) -> Self {
+        let (width, height) = img.dimensions();
+        Self {
+            image: img,
+            width,
+            height,
+        }
+    }
+
     pub fn from_path(path: &PathBuf) -> Result<Self> {
         let img = Self::load(path)?;
-
         let img = Self::resize(img);
         let img = Self::colorise(img);
 
@@ -54,25 +63,39 @@ impl Frame {
 
         img.resize_exact(new_img_w, new_img_h, image::imageops::FilterType::Nearest)
     }
+
     fn colorise(img: DynamicImage) -> DynamicImage {
-        info!("Colourising frame.");
+        info!("Converting image to grayscale (luma8).");
         img.grayscale()
     }
 
-    pub fn to_ascii(&self) -> Vec<char> {
-        info!("Converting frame to a vector of ascii chars.");
-        // store the ascii image in a single list periodically
-        // separated by newlines.
-        let (ascii_w, ascii_h) = (self.width, self.height);
+    fn brightness_to_ascii_char(brightness: usize) -> char {
+        // multiply first and divide later because in rust
+        // dividing two integers results in an integer which throws away the decimal.
+        let ascii_idx = brightness * (ASCII_CHARS.len() - 1) / 255;
+        ASCII_CHARS[ascii_idx]
+    }
+
+    fn calculate_padding(ascii_width: u32, ascii_height: u32) -> (u32, u32) {
         let (term_w, term_h) = get_terminal_size();
 
-        let pad_top = ((term_h as i32 - ascii_h as i32) / 2).max(0) as u32;
-        let pad_left = ((term_w as i32 - ascii_w as i32) / 2).max(0) as u32;
+        let pad_left = ((term_w as i32 - ascii_width as i32) / 2).max(0) as u32;
+        let pad_top = ((term_h as i32 - ascii_height as i32) / 2).max(0) as u32;
 
+        (pad_left, pad_top)
+    }
+
+    /// store the ascii image in a single list separated by newlines.
+    pub fn to_ascii(&self) -> Vec<char> {
+        info!("Converting frame to a vector of ascii chars.");
+        let (ascii_w, ascii_h) = (self.width, self.height);
+
+        // calculate required padding based on terminal size
+        let (pad_left, pad_top) = Self::calculate_padding(ascii_w, ascii_h);
+
+        // init ascii 2d matrix as a 1d vector
         // include padding in new width on one side
         let new_width = self.width + pad_left;
-
-        // init finall ascii 2d matrix as a 1d vector
         let mut ascii_image: Vec<char> =
             Vec::with_capacity((new_width * self.height) as usize + self.height as usize);
 
@@ -90,10 +113,7 @@ impl Frame {
                 let pixel = self.image.get_pixel(x, y);
                 let brightness = pixel[0] as usize;
 
-                // multiply first and divide later because in rust
-                // dividing two integers results in an integer which throws away the decimal.
-                let ascii_idx = brightness * (ASCII_CHARS.len() - 1) / 255;
-                let ascii_char = ASCII_CHARS[ascii_idx];
+                let ascii_char = Self::brightness_to_ascii_char(brightness);
 
                 ascii_image.push(ascii_char);
             }
@@ -108,5 +128,28 @@ impl Frame {
         for c in artscii {
             print!("{}", c)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+
+    use super::*;
+    use image::{ImageBuffer, Luma};
+
+    fn create_test_img(width: u32, height: u32, default_pixel: u8) -> DynamicImage {
+        let img = ImageBuffer::from_pixel(width, height, Luma([default_pixel]));
+        DynamicImage::ImageLuma8(img)
+    }
+
+    #[test]
+    fn convert_img_to_frame() {
+        let img = create_test_img(8, 8, 0);
+        let frame = Frame::from_image(img);
+        let (w, h) = (frame.width, frame.height);
+
+        // frame has correct dimensions
+        assert_eq!(w, 8);
+        assert_eq!(h, 8);
     }
 }
