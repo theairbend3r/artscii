@@ -6,7 +6,7 @@ description = "A cli tool to generate ascii art."
 readme = "README.md"
 homepage = "https://github.com/theairbend3r/artscii"
 repository = "https://github.com/theairbend3r/artscii"
-license = "GPL-3.0 license"
+license = "GPL-3.0"
 keywords = ["ascii", "cli"]
 categories = ["command-line-utilities"]
 
