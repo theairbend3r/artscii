@@ -2,6 +2,13 @@
 name = "artscii"
 version = "0.1.0"
 edition = "2024"
+description = "A cli tool to generate ascii art."
+readme = "README.md"
+homepage = "https://github.com/theairbend3r/artscii"
+repository = "https://github.com/theairbend3r/artscii"
+license = "GPL-3.0 license"
+keywords = ["ascii", "cli"]
+categories = ["command-line-utilities"]
 
 [dependencies]
 anyhow = "1.0.102"
