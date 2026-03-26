@@ -1,27 +1,22 @@
 name: release
 
-# Only do the release on v.x.y.z tags.
 on:
   push:
     tags:
       - "v*"
   workflow_dispatch:
 
-# We need this to be able to create releases.
+
 permissions:
   contents: write
   
 jobs:
-  # The create-release job runs purely to initialize the GitHub release itself,
-  # and names the release after the `x.y.z` tag that was pushed. It's separate
-  # from building the release so that we only create the release once.
   create-release:
     name: create-release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
       - name: Get the release version from the tag
-        # run: echo "VERSION=${{ github.ref_name#v }}" >> $GITHUB_ENV
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
       - name: Show the version
         run: |
@@ -40,7 +35,6 @@ jobs:
       - name: Create GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        # run: gh release create $VERSION --draft --verify-tag --title $VERSION
         run: gh release create "v$VERSION" --draft --verify-tag --title "v$VERSION"
     outputs:
       version: ${{ env.VERSION }}
@@ -85,3 +79,25 @@ jobs:
           
           tar -czf "$NAME.tar.gz" -C dist "$NAME"
   
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{ matrix.target }}
+          path: "*.tar.gz"
+
+  release:
+    needs: [create-release, build-release]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: dist
+
+      - name: Upload to GitHub release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          VERSION="${{ needs.create-release.outputs.version }}"
+          gh release upload "v$VERSION" dist/**/*.tar.gz
