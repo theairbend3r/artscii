@@ -44,3 +44,44 @@ jobs:
         run: gh release create "v$VERSION" --draft --verify-tag --title "v$VERSION"
     outputs:
       version: ${{ env.VERSION }}
+
+  build-release:
+    needs: create-release
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - os: ubuntu-latest
+            target: x86_64-unknown-linux-gnu
+          - os: macos-latest
+            target: aarch64-apple-darwin
+
+    env:
+      BINARY_NAME: myapp
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install Rust
+        uses: dtolnay/rust-toolchain@stable
+        with:
+          targets: ${{ matrix.target }}
+
+      - name: Build
+        run: cargo build --release --target ${{ matrix.target }}
+
+      - name: Strip binary
+        run: strip target/${{ matrix.target }}/release/${BINARY_NAME} || true
+
+      - name: Package
+        run: |
+          VERSION="${{ needs.create-release.outputs.version }}"
+          NAME="${BINARY_NAME}-${VERSION}-${{ matrix.target }}"
+          
+          mkdir -p dist/$NAME
+          cp target/${{ matrix.target }}/release/${BINARY_NAME} dist/$NAME/
+          
+          tar -czf "$NAME.tar.gz" -C dist "$NAME"
+  
