@@ -19,7 +19,7 @@ jobs:
     name: create-release
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v5
+      - uses: actions/checkout@v4
       - name: Get the release version from the tag
         # run: echo "VERSION=${{ github.ref_name#v }}" >> $GITHUB_ENV
         run: echo "VERSION=${GITHUB_REF_NAME#v}" >> $GITHUB_ENV
@@ -59,7 +59,7 @@ jobs:
             target: aarch64-apple-darwin
 
     env:
-      BINARY_NAME: myapp
+      BINARY_NAME: artscii
 
     steps:
       - uses: actions/checkout@v4
