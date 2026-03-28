@@ -1,6 +1,6 @@
 # artscii
 
-> A cli tool to generate ascii art.
+A cli tool to generate ascii art.
 
 ```
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
