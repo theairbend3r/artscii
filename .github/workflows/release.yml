@@ -6,7 +6,6 @@ on:
       - "v*"
   workflow_dispatch:
 
-
 permissions:
   contents: write
 
@@ -24,18 +23,20 @@ jobs:
           VERSION="${GITHUB_REF_NAME#v}"
           echo "VERSION=$VERSION" >> $GITHUB_ENV
           echo "version=$VERSION" >> $GITHUB_OUTPUT
-          
+
       - name: Verify Cargo.toml version matches tag
         run: |
           if ! grep -q "version = \"$VERSION\"" Cargo.toml; then
             echo "Cargo.toml version does not match tag" >&2
             exit 1
           fi
-          
+
       - name: Create draft GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: gh release create "v${{ steps.set-version.outputs.version }}" --draft --title "v${{ steps.set-version.outputs.version }}"
+        run:
+          gh release create "v${{ steps.set-version.outputs.version }}" --draft
+          --title "v${{ steps.set-version.outputs.version }}"
 
   build-release:
     needs: create-release
@@ -64,19 +65,16 @@ jobs:
       - name: Build
         run: cargo build --release --target ${{ matrix.target }}
 
-      - name: Strip binary
-        run: strip target/${{ matrix.target }}/release/${BINARY_NAME} || true
-
       - name: Package
         run: |
           VERSION="${{ needs.create-release.outputs.version }}"
           NAME="${BINARY_NAME}-${VERSION}-${{ matrix.target }}"
-          
+
           mkdir -p dist/$NAME
           cp target/${{ matrix.target }}/release/${BINARY_NAME} dist/$NAME/
-          
+
           tar -czf "$NAME.tar.gz" -C dist "$NAME"
-  
+
       - name: Upload artifact
         uses: actions/upload-artifact@v6
         with:
@@ -90,12 +88,12 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v6
-        
+
       - name: Download artifacts
         uses: actions/download-artifact@v8
         with:
           path: dist
-          
+
       - name: Upload to GitHub release
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
