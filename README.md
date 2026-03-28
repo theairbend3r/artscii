@@ -31,8 +31,9 @@ A cli tool to generate ascii art.
 
 ### Pre-built binary (recommended)
 
-Download the binary for your preferred operating system, un-compress it, and
-enjoy!
+- Download `artscii-...-.tar.gz` for your preferred platform.
+- Extract the file via `tar xzvf artscii-...-.tar.gz`.
+- Run `./artscii --path /path/to/image.png`.
 
 ### Using Cargo
 
