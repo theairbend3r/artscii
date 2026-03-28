@@ -1,6 +1,6 @@
 # artscii
 
-A cli tool to generate ascii art.
+> A cli tool to generate ascii art.
 
 ```
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
@@ -27,8 +27,29 @@ A cli tool to generate ascii art.
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
 ```
 
-## usage
+## Installation
+
+### Pre-built binary (recommended)
+
+Download the binary for your preferred operating system, un-compress it, and
+enjoy!
+
+### Using Cargo
+
+```bash
+cargo install artscii
+```
+
+## Usage
 
 ```
 artscii --path path/to/img
 ```
+
+### Options
+
+| Flag            | Description   |
+| --------------- | ------------- |
+| `-h, --help`    | Show help     |
+| `-v, --version` | Show version  |
+| `--path`        | Path to image |
