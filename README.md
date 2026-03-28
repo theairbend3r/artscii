@@ -31,9 +31,11 @@ A cli tool to generate ascii art.
 
 ### Pre-built binary (recommended)
 
+Head over the [releases](https://github.com/theairbend3r/artscii/releases) page.
+
 - Download `artscii-...-.tar.gz` for your preferred platform.
 - Extract the file via `tar xzvf artscii-...-.tar.gz`.
-- Run `./artscii --path /path/to/image.png`.
+- Run `./artscii --path /path/to/img`.
 
 ### Using Cargo
 
