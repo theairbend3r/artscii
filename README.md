@@ -45,14 +45,18 @@ cargo install artscii
 
 ## Usage
 
-```
+```bash
 artscii --path path/to/img
 ```
 
 ### Options
 
-| Flag            | Description   |
-| --------------- | ------------- |
-| `-h, --help`    | Show help     |
-| `-v, --version` | Show version  |
-| `--path`        | Path to image |
+```bash
+artscii [OPTIONS] --path <PATH>                                                                                                                      │
+                                                                                                                                                            │
+Options:                                                                                                                                                    │
+  -p, --path <PATH>                                                                                                                                         │
+  -v, --verbose...   Increase logging verbosity                                                                                                             │
+  -q, --quiet...     Decrease logging verbosity                                                                                                             │
+  -h, --help         Print help
+```
