@@ -12,7 +12,7 @@ categories = ["command-line-utilities"]
 
 [[bin]]
 name = "artscii"
-path = "src/bin/cli/cli.rs"
+path = "src/bin/cli/main.rs"
 required-features = ["cli"]
 
 [dependencies]

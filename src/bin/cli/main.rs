@@ -1,11 +1,10 @@
 #![cfg(feature = "cli")]
 
-mod frame;
 mod utils;
 
 use anyhow::Result;
+use artscii::core::frame::Frame;
 use clap_verbosity_flag::Verbosity;
-use frame::Frame;
 
 use clap::Parser;
 use log::info;
@@ -29,9 +28,12 @@ fn main() -> Result<()> {
 
     info!("Starting up.");
 
-    let frame = Frame::from_path(&args.path)?;
-
-    frame.render();
+    let (term_w, term_h) = utils::get_terminal_size();
+    let frame = Frame::from_path(&args.path)?
+        .resize(term_w, term_h)?
+        .colorise()?;
+    let ascii = frame.to_ascii().unwrap();
+    Frame::render(ascii);
 
     info!("Shutting down.");
     Ok(())
