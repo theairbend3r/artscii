@@ -45,11 +45,30 @@ cargo install artscii
 
 ## Usage
 
+### As a library
+
+```rust
+use artscii::core::frame::Frame;
+
+// load image as a frame
+let frame = Frame::from_path(&args.path)?
+    .resize(term_w, term_h)?
+    .colorise()?;
+
+// holds a Vec<char> with the converted ascii chars
+let ascii = frame.to_ascii().unwrap();
+
+// optionally print it
+Frame::render(ascii);
+```
+
+### As a CLI tool
+
 ```bash
 artscii --path path/to/img
 ```
 
-### Options
+**Options**
 
 ```bash
 artscii [OPTIONS] --path <PATH>                                                                                                                      │
