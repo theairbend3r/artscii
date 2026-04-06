@@ -51,8 +51,8 @@ cargo install artscii
 use artscii::core::frame::Frame;
 
 // load image as a frame
-let frame = Frame::from_path(&args.path)?
-    .resize(term_w, term_h)?
+let frame = Frame::from_path("./path/to/img")?
+    .resize(32, 32)?
     .colorise()?;
 
 // holds a Vec<char> with the converted ascii chars
