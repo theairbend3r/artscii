@@ -74,11 +74,9 @@ artscii --path path/to/img
 **Options**
 
 ```bash
-artscii [OPTIONS] --path <PATH>                                                                                                                      │
-                                                                                                                                                            │
-Options:                                                                                                                                                    │
-  -p, --path <PATH>                                                                                                                                         │
-  -v, --verbose...   Increase logging verbosity                                                                                                             │
-  -q, --quiet...     Decrease logging verbosity                                                                                                             │
+artscii [OPTIONS]
+  --path <PATH>  Options:   -p, --path <PATH>
+  -v, --verbose...   Increase logging verbosity
+  -q, --quiet...     Decrease logging verbosity
   -h, --help         Print help
 ```
