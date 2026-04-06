@@ -1,16 +1,15 @@
+use std::path::PathBuf;
+
 use anyhow::{Context, Result};
 use image::{DynamicImage, GenericImageView};
 use log::info;
-use std::path::PathBuf;
-
-use crate::utils::get_terminal_size;
 
 const ASCII_CHARS: [char; 10] = ['@', '#', 'S', '%', '?', '*', '+', ';', ':', '.'];
 
 pub struct Frame {
-    image: DynamicImage,
-    width: u32,
-    height: u32,
+    pub image: DynamicImage,
+    pub width: u32,
+    pub height: u32,
 }
 
 impl Frame {
@@ -26,9 +25,6 @@ impl Frame {
 
     pub fn from_path(path: &PathBuf) -> Result<Self> {
         let img = Self::load(path)?;
-        let img = Self::resize(img);
-        let img = Self::colorise(img);
-
         let (width, height) = img.dimensions();
 
         Ok(Self {
@@ -43,17 +39,16 @@ impl Frame {
         image::open(path).with_context(|| format!("Failed to read file: `{}`", path.display()))
     }
 
-    fn resize(img: DynamicImage) -> DynamicImage {
+    pub fn resize(self, targ_w: u32, targ_h: u32) -> Result<Self> {
         info!("Resizing frame.");
-        let (img_w, img_h) = img.dimensions();
-        let (term_w, term_h) = get_terminal_size();
+        let (img_w, img_h) = self.image.dimensions();
 
         // terminal characters are approx twice as high as they are wide
         // original aspect => w/h = a
         // we want aspect => w/(h/2) = 2 * (w/h)
         let char_aspect_ratio = 2.0;
-        let scale_w = term_w as f32 / img_w as f32;
-        let scale_h = term_h as f32 / (img_h as f32 / char_aspect_ratio);
+        let scale_w = targ_w as f32 / img_w as f32;
+        let scale_h = targ_h as f32 / (img_h as f32 / char_aspect_ratio);
 
         // find which direction to expand in to prevent image from getting cut-off
         let scale = scale_w.min(scale_h);
@@ -61,37 +56,58 @@ impl Frame {
         let new_img_w = (img_w as f32 * scale).round() as u32;
         let new_img_h = (img_h as f32 / char_aspect_ratio * scale).round() as u32;
 
-        img.resize_exact(new_img_w, new_img_h, image::imageops::FilterType::Nearest)
+        let frame = Self {
+            image: self.image.resize_exact(
+                new_img_w,
+                new_img_h,
+                image::imageops::FilterType::Nearest,
+            ),
+            width: new_img_w,
+            height: new_img_h,
+        };
+
+        Ok(frame)
     }
 
-    fn colorise(img: DynamicImage) -> DynamicImage {
+    pub fn colorise(self) -> Result<Self> {
         info!("Converting image to grayscale (luma8).");
-        img.grayscale()
+
+        let frame = Self {
+            image: self.image.grayscale(),
+            width: self.width,
+            height: self.height,
+        };
+
+        Ok(frame)
     }
 
-    fn brightness_to_ascii_char(brightness: usize) -> char {
+    pub fn brightness_to_ascii_char(brightness: usize) -> char {
         // multiply first and divide later because in rust
         // dividing two integers results in an integer which throws away the decimal.
         let ascii_idx = brightness * (ASCII_CHARS.len() - 1) / 255;
         ASCII_CHARS[ascii_idx]
     }
 
-    fn calculate_padding(ascii_width: u32, ascii_height: u32) -> (u32, u32) {
-        let (term_w, term_h) = get_terminal_size();
-
-        let pad_left = ((term_w as i32 - ascii_width as i32) / 2).max(0) as u32;
-        let pad_top = ((term_h as i32 - ascii_height as i32) / 2).max(0) as u32;
+    pub fn calculate_padding(
+        ascii_width: u32,
+        ascii_height: u32,
+        canvas_w: u32,
+        canvas_h: u32,
+    ) -> (u32, u32) {
+        let pad_left = ((canvas_w as i32 - ascii_width as i32) / 2).max(0) as u32;
+        let pad_top = ((canvas_h as i32 - ascii_height as i32) / 2).max(0) as u32;
 
         (pad_left, pad_top)
     }
 
     /// store the ascii image in a single list separated by newlines.
-    pub fn to_ascii(&self) -> Vec<char> {
+    pub fn to_ascii(&self) -> Result<Vec<char>> {
         info!("Converting frame to a vector of ascii chars.");
-        let (ascii_w, ascii_h) = (self.width, self.height);
+        // let (ascii_w, ascii_h) = (self.width, self.height);
 
         // calculate required padding based on terminal size
-        let (pad_left, pad_top) = Self::calculate_padding(ascii_w, ascii_h);
+        // let (pad_left, pad_top) = Self::calculate_padding(ascii_w, ascii_h, canvas_w, canvas_h);
+        let (pad_left, pad_top) = (0, 0);
 
         // init ascii 2d matrix as a 1d vector
         // include padding in new width on one side
@@ -119,13 +135,13 @@ impl Frame {
             }
             ascii_image.push('\n');
         }
-        ascii_image
+
+        Ok(ascii_image)
     }
 
-    pub fn render(&self) {
-        let artscii = self.to_ascii();
+    pub fn render(ascii_vec: Vec<char>) {
         info!("Printing the computed vector of ascii characters.");
-        for c in artscii {
+        for c in ascii_vec {
             print!("{}", c)
         }
     }

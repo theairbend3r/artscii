@@ -1,3 +1,5 @@
+#![cfg(feature = "cli")]
+
 mod frame;
 mod utils;
 
