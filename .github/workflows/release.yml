@@ -63,7 +63,9 @@ jobs:
           targets: ${{ matrix.target }}
 
       - name: Build
-        run: cargo build --release --target ${{ matrix.target }}
+        run:
+          cargo build --release --target ${{ matrix.target }} --features cli
+          --bin ${BINARY_NAME}
 
       - name: Package
         run: |
