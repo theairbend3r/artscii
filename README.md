@@ -68,7 +68,7 @@ cargo add artscii
 artscii --path path/to/img
 ```
 
-**Options**
+Options
 
 ```bash
 artscii [OPTIONS]
