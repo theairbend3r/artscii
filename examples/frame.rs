@@ -1,16 +1,19 @@
-use artscii::core::frame::Frame;
 use std::path::PathBuf;
 
+use artscii::core::{
+    canvas::Canvas,
+    decoder::{decoder::Decoder, image::ImageDecoder},
+};
+
 fn main() {
-    let path = PathBuf::from("./../test-images/cuddlyferris.png");
+    // load image from disk into a Frame
+    // let path = PathBuf::from("./../test-images/cuddlyferris.png");
+    let path = PathBuf::from("./../test-images/1.png");
+    let img_decoder = ImageDecoder::new(path);
+    let frame = img_decoder.decode().unwrap();
+    let frame = frame.to_ascii().unwrap();
 
-    let frame = Frame::from_path(&path).unwrap();
-    println!("{}x{}", frame.width, frame.height);
-    let resized_frame = frame.resize(64, 64).unwrap();
-    println!("{}x{}", resized_frame.width, resized_frame.height);
-    let colourised_frame = resized_frame.colorise().unwrap();
-    println!("{}x{}", colourised_frame.width, colourised_frame.height);
-
-    let ascii = colourised_frame.to_ascii().unwrap();
-    Frame::render(ascii);
+    // optionally load canvas to print
+    let canvas = Canvas::new(210, 53);
+    canvas.render(frame, artscii::core::canvas::Padding::Center);
 }
