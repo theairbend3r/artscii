@@ -3,7 +3,9 @@
 mod utils;
 
 use anyhow::Result;
-use artscii::core::frame::Frame;
+use artscii::core::canvas::{Canvas, Padding};
+use artscii::core::decoder::decoder::Decoder;
+use artscii::core::decoder::image::ImageDecoder;
 use clap_verbosity_flag::Verbosity;
 
 use clap::Parser;
@@ -29,11 +31,14 @@ fn main() -> Result<()> {
     info!("Starting up.");
 
     let (term_w, term_h) = utils::get_terminal_size();
-    let frame = Frame::from_path(&args.path)?
-        .resize(term_w, term_h)?
-        .colorise()?;
-    let ascii = frame.to_ascii().unwrap();
-    Frame::render(ascii);
+
+    let img_decoder = ImageDecoder::new(args.path);
+    let frame = img_decoder.decode().unwrap();
+    let frame = frame.resize(term_w, term_h);
+    let frame = frame.to_ascii().unwrap();
+
+    let canvas = Canvas::new(term_w, term_h);
+    canvas.render(frame, Padding::Center);
 
     info!("Shutting down.");
     Ok(())
