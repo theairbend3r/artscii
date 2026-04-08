@@ -11,6 +11,7 @@ fn main() {
     let path = PathBuf::from("./../test-images/1.png");
     let img_decoder = ImageDecoder::new(path);
     let frame = img_decoder.decode().unwrap();
+    let frame = frame.resize(40, 20);
     let frame = frame.to_ascii().unwrap();
 
     // optionally load canvas to print
