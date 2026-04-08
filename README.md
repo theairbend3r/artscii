@@ -3,7 +3,7 @@
 <!-- prettier-ignore -->
 ![crates.io](https://img.shields.io/crates/v/artscii) ![Docs.rs](https://img.shields.io/docsrs/artscii) ![Crates.io License](https://img.shields.io/crates/l/artscii)
 
-A tool to generate ascii art.
+A cli tool to generate ascii art.
 
 ```
 ::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::::
