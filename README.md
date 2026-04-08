@@ -81,16 +81,26 @@ artscii [OPTIONS]
 ### As a library
 
 ```rust
-use artscii::core::frame::Frame;
+use std::path::PathBuf;
 
-// load image as a frame
-let frame = Frame::from_path("./path/to/img")?
-    .resize(32, 32)?
-    .colorise()?;
+use artscii::core::{
+    canvas::{Canvas, Padding},
+    decoder::{decoder::Decoder, image::ImageDecoder},
+};
 
-// holds a Vec<char> with the converted ascii chars
-let ascii = frame.to_ascii().unwrap();
+fn main() {
+    // load image from disk into a Frame
+    let path = PathBuf::from("./../test-images/cuddlyferris.png");
+    let img_decoder = ImageDecoder::new(path);
+    let frame = img_decoder
+        .decode()
+        .unwrap()
+        .resize(40, 20)
+        .to_ascii()
+        .unwrap();
 
-// optionally print it
-Frame::render(ascii);
+    // optionally load canvas to print
+    let canvas = Canvas::new(210, 53);
+    canvas.render(frame, Padding::Center);
+}
 ```
