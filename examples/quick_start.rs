@@ -7,8 +7,7 @@ use artscii::core::{
 
 fn main() {
     // load image from disk into a Frame
-    // let path = PathBuf::from("./../test-images/cuddlyferris.png");
-    let path = PathBuf::from("./../test-images/1.png");
+    let path = PathBuf::from("./../test-images/cuddlyferris.png");
     let img_decoder = ImageDecoder::new(path);
     let frame = img_decoder.decode().unwrap();
     let frame = frame.resize(40, 20);
