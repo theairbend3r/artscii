@@ -62,10 +62,20 @@ cargo add artscii
 
 ## Usage
 
+You can convert still images and animations into ASCII art.
+
+Following file formats are currently supported.
+
+| Static | Animation |
+| ------ | --------- |
+| PNG    | GIF       |
+| JPEG   |           |
+| JPG    |           |
+
 ### As a CLI tool
 
 ```bash
-artscii --path path/to/img
+artscii --path path/to/file
 ```
 
 Options
@@ -83,6 +93,8 @@ Options:
 
 ### As a library
 
+See `examples/` to get started.
+
 ```rust
 use std::path::PathBuf;
 
@@ -93,14 +105,9 @@ use artscii::core::{
 
 fn main() {
     // load image from disk into a Frame
-    let path = PathBuf::from("./../test-images/cuddlyferris.png");
-    let img_decoder = ImageDecoder::new(path);
-    let frame = img_decoder
-        .decode()
-        .unwrap()
-        .resize(40, 20)
-        .to_ascii()
-        .unwrap();
+    let path = PathBuf::from("./path/to/image");
+    let img_decoder = ImageDecoder::new(path).decode().unwrap();
+    let frame = img_decoder.resize(40, 20).to_ascii().unwrap();
 
     // optionally load canvas to print
     let canvas = Canvas::new(210, 53);
