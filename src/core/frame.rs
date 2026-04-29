@@ -25,6 +25,14 @@ pub struct Ascii {
 }
 
 impl Frame {
+    pub fn new(pixels: Vec<u8>, width: u32, height: u32) -> Self {
+        Self {
+            pixels,
+            width,
+            height,
+        }
+    }
+
     pub fn resize(self, target_width: u32, target_height: u32) -> Self {
         let mut resized_frame: Vec<u8> =
             Vec::with_capacity((target_width * target_height) as usize);
