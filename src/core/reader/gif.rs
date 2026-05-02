@@ -6,11 +6,11 @@ use std::path::PathBuf;
 
 use crate::core::frame::Frame;
 
-pub struct DecoderGif<'a> {
+pub struct ReaderGif<'a> {
     inner: image::Frames<'a>,
 }
 
-impl DecoderGif<'_> {
+impl ReaderGif<'_> {
     pub fn new(path: PathBuf) -> Self {
         let file = File::open(path).unwrap();
         let reader = BufReader::new(file);
@@ -22,7 +22,7 @@ impl DecoderGif<'_> {
     }
 }
 
-impl Iterator for DecoderGif<'_> {
+impl Iterator for ReaderGif<'_> {
     type Item = Frame;
 
     fn next(&mut self) -> Option<Self::Item> {
