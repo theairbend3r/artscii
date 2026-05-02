@@ -2,29 +2,27 @@ use std::path::PathBuf;
 
 use image::{GenericImageView, ImageReader};
 
-use crate::core::{decoder::decoder::Decoder, frame::Frame};
+use crate::core::frame::Frame;
 
 #[derive(Debug)]
-pub struct ImageDecoder {
+pub struct DecoderImage {
     path: PathBuf,
 }
 
-impl ImageDecoder {
+impl DecoderImage {
     pub fn new(path: PathBuf) -> Self {
         Self { path }
     }
-}
 
-impl Decoder for ImageDecoder {
-    fn decode(&self) -> anyhow::Result<Frame> {
+    pub fn decode(&self) -> anyhow::Result<Frame> {
         let img = ImageReader::open(&self.path)?.decode()?;
         let (width, height) = img.dimensions();
-        let pixels = img.into_luma8().into_raw();
 
-        Ok(Frame {
-            pixels,
-            width,
-            height,
-        })
+        let gray = img.to_luma8();
+        let pixels = gray.into_raw();
+
+        let frame = Frame::new(pixels, width, height);
+
+        Ok(frame)
     }
 }
