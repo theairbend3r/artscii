@@ -45,7 +45,7 @@ fn main() -> Result<()> {
                 canvas.render_with_delay(frame, Padding::Center, 20);
             }
         }
-        Some("png") | Some("jpg") | Some("jpg") | Some("jpeg") => {
+        Some("png") | Some("jpg") | Some("jpeg") => {
             let img = ReaderImage::new(args.path).read()?;
 
             let frame = img.resize(term_w, term_h).to_ascii()?;
