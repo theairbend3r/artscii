@@ -1,3 +1,9 @@
+use std::{
+    io::{self, Write},
+    thread,
+    time::Duration,
+};
+
 use crate::core::frame::Ascii;
 
 pub struct Canvas {
@@ -31,13 +37,9 @@ impl Canvas {
             Padding::Custom(left, top) => (left, top),
         };
 
-        println!("c {}, {}", &self.width, &self.height);
-        println!("f {}, {}", frame.width, frame.height);
-        println!("p {}, {}", pad_left, pad_top);
-
         // pad top
         for _ in 0..pad_top {
-            println!(" ");
+            println!();
         }
 
         // print on screen
@@ -58,7 +60,17 @@ impl Canvas {
 
         // pad bottom
         for _ in 0..pad_top {
-            println!(" ");
+            println!();
         }
+    }
+
+    pub fn render_with_delay(&self, frame: Ascii, padding: Padding, frames_per_second: u32) {
+        print!("\x1b[H"); // move cursor to top-left
+        io::stdout().flush().unwrap();
+
+        self.render(frame, padding);
+
+        io::stdout().flush().unwrap();
+        thread::sleep(Duration::from_secs_f32(1.0 / frames_per_second as f32));
     }
 }
