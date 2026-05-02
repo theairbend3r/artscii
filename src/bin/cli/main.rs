@@ -43,22 +43,22 @@ fn main() -> Result<()> {
 
     match file_extension {
         Some("gif") => {
-            let gif = ReaderGif::new(args.path);
+            let gif_iter = ReaderGif::new(args.path);
 
-            for f in gif {
-                let f = f.resize(term_w, term_h).to_ascii().unwrap();
+            for frame in gif_iter {
+                let frame = frame.resize(term_w, term_h).to_ascii()?;
 
                 // clear screen + move cursor to top-left
                 print!("\x1b[2J\x1b[H");
-                canvas.render(f, Padding::Center);
-                io::stdout().flush().unwrap();
+                canvas.render(frame, Padding::Center);
+                io::stdout().flush()?;
                 thread::sleep(Duration::from_millis(50));
             }
         }
         Some("png") | Some("jpg") | Some("jpg") | Some("jpeg") => {
-            let img = ReaderImage::new(args.path).decode().unwrap();
+            let img = ReaderImage::new(args.path).read()?;
 
-            let frame = img.resize(term_w, term_h).to_ascii().unwrap();
+            let frame = img.resize(term_w, term_h).to_ascii()?;
 
             canvas.render(frame, Padding::Center);
         }

@@ -14,7 +14,7 @@ impl ReaderImage {
         Self { path }
     }
 
-    pub fn decode(&self) -> anyhow::Result<Frame> {
+    pub fn read(&self) -> anyhow::Result<Frame> {
         let img = ImageReader::open(&self.path)?.decode()?;
         let (width, height) = img.dimensions();
 
