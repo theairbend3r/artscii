@@ -1,13 +1,13 @@
-use anyhow::Result;
+use anyhow::{Result, bail};
 
-const ASCII_CHARS: [char; 10] = ['@', '#', 'S', '%', '?', '*', '+', ';', ':', '.'];
+use crate::core::charset::Charset;
 
-pub fn brightness_to_ascii_char(brightness: u8) -> char {
+pub fn brightness_to_ascii_char(brightness: u8, charset: &Charset) -> char {
     // multiply first and divide later because in rust
     // dividing two integers results in an integer which throws away the decimal.
-    let ascii_idx = brightness as usize * (ASCII_CHARS.len() - 1) / 255;
+    let ascii_idx = brightness as usize * (charset.chars.len() - 1) / 255;
 
-    ASCII_CHARS[ascii_idx]
+    charset.chars[ascii_idx]
 }
 
 #[derive(Debug)]
@@ -58,12 +58,16 @@ impl Frame {
         }
     }
 
-    pub fn to_ascii(self) -> Result<Ascii> {
+    pub fn to_ascii(self, charset: &Charset) -> Result<Ascii> {
         let mut ascii_frame: Vec<char> = Vec::with_capacity((self.width * self.height) as usize);
+
+        if self.pixels.is_empty() {
+            bail!("Charset is empty.")
+        }
 
         for i in 0..self.pixels.len() {
             let pixel = self.pixels[i];
-            let ascii = brightness_to_ascii_char(pixel);
+            let ascii = brightness_to_ascii_char(pixel, charset);
             ascii_frame.push(ascii);
         }
 
