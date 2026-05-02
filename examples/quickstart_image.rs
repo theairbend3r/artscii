@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use artscii::core::{
     canvas::{Canvas, Padding},
-    charset::Charset,
+    charset::DefaultCharset,
     reader::image::ReaderImage,
 };
 
@@ -14,10 +14,10 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     let frame = reader.read()?;
 
-    let charset = Charset {
-        chars: vec!['@', '#', 'S', '%', '?', '*', '+', ';', ':', '.'],
-    };
-
+    // let charset = Charset {
+    //     chars: vec!['@', '#', 'S', '%', '?', '*', '+', ';', ':', '.'],
+    // };
+    let charset = DefaultCharset::Braille.chars();
     let frame = frame.resize(40, 20).to_ascii(&charset)?;
 
     canvas.render(frame, Padding::Center);

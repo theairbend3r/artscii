@@ -4,7 +4,7 @@ mod utils;
 
 use anyhow::Result;
 use artscii::core::canvas::{Canvas, Padding};
-use artscii::core::charset::Charset;
+use artscii::core::charset::{Charset, DefaultCharset};
 use artscii::core::reader::gif::ReaderGif;
 use artscii::core::reader::image::ReaderImage;
 use clap_verbosity_flag::Verbosity;
@@ -36,9 +36,7 @@ fn main() -> Result<()> {
 
     let file_extension = args.path.extension().and_then(|e| e.to_str());
 
-    let charset = Charset {
-        chars: vec!['@', '#', 'S', '%', '?', '*', '+', ';', ':', '.'],
-    };
+    let charset = DefaultCharset::Braille.chars();
 
     match file_extension {
         Some("gif") => {
