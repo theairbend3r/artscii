@@ -12,12 +12,6 @@ use clap::Parser;
 use log::info;
 use std::path::PathBuf;
 
-use std::{
-    io::{self, Write},
-    thread,
-    time::Duration,
-};
-
 #[derive(Parser, Debug)]
 struct Args {
     #[arg(short, long)]
@@ -48,11 +42,7 @@ fn main() -> Result<()> {
             for frame in gif_iter {
                 let frame = frame.resize(term_w, term_h).to_ascii()?;
 
-                // clear screen + move cursor to top-left
-                print!("\x1b[2J\x1b[H");
-                canvas.render(frame, Padding::Center);
-                io::stdout().flush()?;
-                thread::sleep(Duration::from_millis(50));
+                canvas.render_with_delay(frame, Padding::Center, 20);
             }
         }
         Some("png") | Some("jpg") | Some("jpg") | Some("jpeg") => {
