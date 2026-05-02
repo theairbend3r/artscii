@@ -4,8 +4,8 @@ mod utils;
 
 use anyhow::Result;
 use artscii::core::canvas::{Canvas, Padding};
-use artscii::core::decoder::gif::DecoderGif;
-use artscii::core::decoder::image::DecoderImage;
+use artscii::core::reader::gif::ReaderGif;
+use artscii::core::reader::image::ReaderImage;
 use clap_verbosity_flag::Verbosity;
 
 use clap::Parser;
@@ -43,7 +43,7 @@ fn main() -> Result<()> {
 
     match file_extension {
         Some("gif") => {
-            let gif = DecoderGif::new(args.path);
+            let gif = ReaderGif::new(args.path);
 
             for f in gif {
                 let f = f.resize(term_w, term_h).to_ascii().unwrap();
@@ -56,7 +56,7 @@ fn main() -> Result<()> {
             }
         }
         Some("png") | Some("jpg") | Some("jpg") | Some("jpeg") => {
-            let img = DecoderImage::new(args.path).decode().unwrap();
+            let img = ReaderImage::new(args.path).decode().unwrap();
 
             let frame = img.resize(term_w, term_h).to_ascii().unwrap();
 

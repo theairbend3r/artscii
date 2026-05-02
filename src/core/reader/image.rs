@@ -5,11 +5,11 @@ use image::{GenericImageView, ImageReader};
 use crate::core::frame::Frame;
 
 #[derive(Debug)]
-pub struct DecoderImage {
+pub struct ReaderImage {
     path: PathBuf,
 }
 
-impl DecoderImage {
+impl ReaderImage {
     pub fn new(path: PathBuf) -> Self {
         Self { path }
     }
