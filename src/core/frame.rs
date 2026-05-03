@@ -2,12 +2,14 @@ use anyhow::{Result, bail};
 
 use crate::core::charset::Charset;
 
-pub fn brightness_to_ascii_char(brightness: u8, charset: &Charset) -> char {
+pub fn brightness_to_ascii_char(brightness: u8, charset: &Charset) -> Result<char> {
+    let charset = charset.chars()?;
+
     // multiply first and divide later because in rust
     // dividing two integers results in an integer which throws away the decimal.
-    let ascii_idx = brightness as usize * (charset.chars().len() - 1) / 255;
+    let ascii_idx = brightness as usize * (charset.len() - 1) / 255;
 
-    charset.chars()[ascii_idx]
+    Ok(charset[ascii_idx])
 }
 
 #[derive(Debug)]
@@ -33,7 +35,11 @@ impl Frame {
         }
     }
 
-    pub fn resize(self, target_width: u32, target_height: u32) -> Self {
+    pub fn resize(self, target_width: u32, target_height: u32) -> Result<Self> {
+        if target_width == 0 || target_height == 0 {
+            bail!("target_width or target_height cannot be 0.")
+        }
+
         let mut resized_frame: Vec<u8> =
             Vec::with_capacity((target_width * target_height) as usize);
 
@@ -51,23 +57,19 @@ impl Frame {
             }
         }
 
-        Self {
+        Ok(Self {
             pixels: resized_frame,
             width: target_width,
             height: target_height,
-        }
+        })
     }
 
     pub fn to_ascii(self, charset: &Charset) -> Result<Ascii> {
         let mut ascii_frame: Vec<char> = Vec::with_capacity((self.width * self.height) as usize);
 
-        if self.pixels.is_empty() {
-            bail!("Charset is empty.")
-        }
-
         for i in 0..self.pixels.len() {
             let pixel = self.pixels[i];
-            let ascii = brightness_to_ascii_char(pixel, charset);
+            let ascii = brightness_to_ascii_char(pixel, charset)?;
             ascii_frame.push(ascii);
         }
 

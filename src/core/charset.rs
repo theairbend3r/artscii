@@ -1,3 +1,5 @@
+use anyhow::{Result, bail};
+
 pub enum Charset {
     Ascii,
     Braille,
@@ -5,11 +7,25 @@ pub enum Charset {
 }
 
 impl Charset {
-    pub fn chars(&self) -> &[char] {
+    pub fn new(chars: Vec<char>) -> Result<Self> {
+        if chars.is_empty() {
+            bail!("Custom charset cannot be empty.")
+        } else {
+            Ok(Self::Custom(chars))
+        }
+    }
+    pub fn chars(&self) -> Result<&[char]> {
         match self {
-            Charset::Ascii => &['@', '#', 'S', '%', '?', '*', '+', ';', ':', '.'],
-            Charset::Braille => &['⠀', '⠁', '⠃', '⠇', '⠏', '⠟', '⠿', '⡿', '⣿'],
-            Charset::Custom(custom_chars) => custom_chars,
+            Self::Ascii => Ok(&['@', '#', 'S', '%', '?', '*', '+', ';', ':', '.']),
+            Self::Braille => Ok(&['⠀', '⠁', '⠃', '⠇', '⠏', '⠟', '⠿', '⡿', '⣿']),
+            Self::Custom(custom_chars) => Ok(custom_chars),
+            // Charset::Custom(custom_chars) => {
+            //     if custom_chars.is_empty() {
+            //         bail!("Custom charset cannot be empty.")
+            //     } else {
+            //         Ok(custom_chars)
+            //     }
+            // }
         }
     }
 }
