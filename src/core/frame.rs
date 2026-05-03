@@ -5,9 +5,9 @@ use crate::core::charset::Charset;
 pub fn brightness_to_ascii_char(brightness: u8, charset: &Charset) -> char {
     // multiply first and divide later because in rust
     // dividing two integers results in an integer which throws away the decimal.
-    let ascii_idx = brightness as usize * (charset.chars.len() - 1) / 255;
+    let ascii_idx = brightness as usize * (charset.chars().len() - 1) / 255;
 
-    charset.chars[ascii_idx]
+    charset.chars()[ascii_idx]
 }
 
 #[derive(Debug)]

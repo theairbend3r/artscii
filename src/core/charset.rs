@@ -1,21 +1,15 @@
-pub struct Charset {
-    pub chars: Vec<char>,
-}
-
-pub enum DefaultCharset {
+pub enum Charset {
     Ascii,
     Braille,
+    Custom(Vec<char>),
 }
 
-impl DefaultCharset {
-    pub fn chars(&self) -> Charset {
+impl Charset {
+    pub fn chars(&self) -> &[char] {
         match self {
-            DefaultCharset::Ascii => Charset {
-                chars: vec!['@', '#', 'S', '%', '?', '*', '+', ';', ':', '.'],
-            },
-            DefaultCharset::Braille => Charset {
-                chars: vec!['⠀', '⠁', '⠃', '⠇', '⠏', '⠟', '⠿', '⡿', '⣿'],
-            },
+            Charset::Ascii => &['@', '#', 'S', '%', '?', '*', '+', ';', ':', '.'],
+            Charset::Braille => &['⠀', '⠁', '⠃', '⠇', '⠏', '⠟', '⠿', '⡿', '⣿'],
+            Charset::Custom(custom_chars) => custom_chars,
         }
     }
 }
