@@ -13,7 +13,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     for frame in gif_iter {
         let frame = frame.resize(80, 40)?.to_ascii(&charset)?;
 
-        canvas.render_with_delay(frame, Padding::Center, 20);
+        canvas.render_clear_delay(frame, Padding::Center, 20);
     }
 
     Ok(())

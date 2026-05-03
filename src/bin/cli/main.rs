@@ -44,7 +44,7 @@ fn main() -> Result<()> {
             for frame in gif_iter {
                 let frame = frame.resize(term_w, term_h)?.to_ascii(&charset)?;
 
-                canvas.render_with_delay(frame, Padding::Center, 20);
+                canvas.render_clear_delay(frame, Padding::Center, 20);
             }
         }
         Some("png") | Some("jpg") | Some("jpeg") => {
