@@ -8,7 +8,6 @@ use artscii::core::charset::Charset;
 use artscii::core::reader::gif::ReaderGif;
 use artscii::core::reader::image::ReaderImage;
 use clap_verbosity_flag::Verbosity;
-// use std::str::FromStr;
 
 use clap::Parser;
 use log::info;
@@ -37,29 +36,35 @@ fn main() -> Result<()> {
     // init canvas
     let (term_w, term_h) = utils::get_terminal_size();
     let canvas = Canvas::new(term_w, term_h);
+    info!("Initialise Canvas.");
 
     // init charset for rendering
     let charset: Charset = args.charset.parse().map_err(anyhow::Error::msg)?;
+    info!("Initialise Charset.");
 
     // get file extension to pick a rendering method (single print vs animate)
     let file_extension = args.path.extension().and_then(|e| e.to_str());
 
     match file_extension {
         Some("gif") => {
-            let gif_iter = ReaderGif::new(args.path);
+            info!("Start rendering gif.");
 
+            let gif_iter = ReaderGif::new(args.path);
             for frame in gif_iter {
                 let frame = frame.resize(term_w, term_h)?.to_charset(&charset)?;
-
                 canvas.render_clear_delay(frame, Padding::Center, 20);
             }
+
+            info!("Finish rendering gif.");
         }
         Some("png") | Some("jpg") | Some("jpeg") => {
+            info!("Start rendering image.");
+
             let img = ReaderImage::new(args.path).read()?;
-
             let frame = img.resize(term_w, term_h)?.to_charset(&charset)?;
-
             canvas.render(frame, Padding::Center);
+
+            info!("Finish rendering image.");
         }
         Some(_) => {
             println!("Unsupported file type.");
