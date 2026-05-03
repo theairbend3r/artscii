@@ -26,8 +26,9 @@ impl Iterator for ReaderGif<'_> {
     type Item = Frame;
 
     fn next(&mut self) -> Option<Self::Item> {
-        let nextframe = self.inner.next().unwrap();
-        let buffer = nextframe.unwrap().into_buffer();
+        let nextframe = self.inner.next()?;
+        let nextframe = nextframe.ok()?;
+        let buffer = nextframe.into_buffer();
 
         let (width, height) = buffer.dimensions();
 
