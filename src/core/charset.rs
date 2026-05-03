@@ -19,13 +19,6 @@ impl Charset {
             Self::Ascii => Ok(&['@', '#', 'S', '%', '?', '*', '+', ';', ':', '.']),
             Self::Braille => Ok(&['⠀', '⠁', '⠃', '⠇', '⠏', '⠟', '⠿', '⡿', '⣿']),
             Self::Custom(custom_chars) => Ok(custom_chars),
-            // Charset::Custom(custom_chars) => {
-            //     if custom_chars.is_empty() {
-            //         bail!("Custom charset cannot be empty.")
-            //     } else {
-            //         Ok(custom_chars)
-            //     }
-            // }
         }
     }
 }

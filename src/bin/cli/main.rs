@@ -17,12 +17,23 @@ use std::path::PathBuf;
 struct Args {
     #[arg(short, long)]
     path: PathBuf,
+    #[arg(short, long)]
+    charset: String,
     #[command(flatten)]
     verbose: Verbosity,
 }
 
 fn main() -> Result<()> {
     let args = Args::parse();
+
+    let charset = if args.charset == "ascii" {
+        Charset::Ascii
+    } else if args.charset == "braille" {
+        Charset::Braille
+    } else {
+        let custom_chars = args.charset.chars().collect::<Vec<_>>();
+        Charset::new(custom_chars)?
+    };
 
     // init logger
     env_logger::Builder::new()
@@ -38,7 +49,6 @@ fn main() -> Result<()> {
 
     match file_extension {
         Some("gif") => {
-            let charset = Charset::Braille;
             let gif_iter = ReaderGif::new(args.path);
 
             for frame in gif_iter {
@@ -48,7 +58,6 @@ fn main() -> Result<()> {
             }
         }
         Some("png") | Some("jpg") | Some("jpeg") => {
-            let charset = Charset::Ascii;
             let img = ReaderImage::new(args.path).read()?;
 
             let frame = img.resize(term_w, term_h)?.to_charset(&charset)?;
