@@ -4,6 +4,7 @@ mod utils;
 
 use anyhow::Result;
 use artscii::core::canvas::{Canvas, Padding};
+use artscii::core::charset::Charset;
 use artscii::core::reader::gif::ReaderGif;
 use artscii::core::reader::image::ReaderImage;
 use clap_verbosity_flag::Verbosity;
@@ -37,18 +38,20 @@ fn main() -> Result<()> {
 
     match file_extension {
         Some("gif") => {
+            let charset = Charset::Braille;
             let gif_iter = ReaderGif::new(args.path);
 
             for frame in gif_iter {
-                let frame = frame.resize(term_w, term_h).to_ascii()?;
+                let frame = frame.resize(term_w, term_h).to_ascii(&charset)?;
 
                 canvas.render_with_delay(frame, Padding::Center, 20);
             }
         }
         Some("png") | Some("jpg") | Some("jpeg") => {
+            let charset = Charset::Ascii;
             let img = ReaderImage::new(args.path).read()?;
 
-            let frame = img.resize(term_w, term_h).to_ascii()?;
+            let frame = img.resize(term_w, term_h).to_ascii(&charset)?;
 
             canvas.render(frame, Padding::Center);
         }

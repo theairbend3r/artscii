@@ -2,6 +2,7 @@ use std::path::PathBuf;
 
 use artscii::core::{
     canvas::{Canvas, Padding},
+    charset::Charset,
     reader::image::ReaderImage,
 };
 
@@ -12,7 +13,9 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let canvas = Canvas::new(210, 53);
 
     let frame = reader.read()?;
-    let frame = frame.resize(40, 20).to_ascii()?;
+
+    let charset = Charset::Custom(vec!['⠀', '⠁', '⠃', ':', 'S', '⠏', '#', '⠿', '⡿', '⣿']);
+    let frame = frame.resize(40, 20).to_ascii(&charset)?;
 
     canvas.render(frame, Padding::Center);
 
