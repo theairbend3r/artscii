@@ -64,7 +64,7 @@ impl Frame {
         })
     }
 
-    pub fn to_ascii(self, charset: &Charset) -> Result<Ascii> {
+    pub fn to_charset(self, charset: &Charset) -> Result<Ascii> {
         let mut ascii_frame: Vec<char> = Vec::with_capacity((self.width * self.height) as usize);
 
         for i in 0..self.pixels.len() {

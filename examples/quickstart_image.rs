@@ -15,7 +15,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
     let frame = reader.read()?;
 
     let charset = Charset::new(vec!['⠀', '⠁', '⠃', ':', 'S', '⠏', '#', '⠿', '⡿', '⣿'])?;
-    let frame = frame.resize(40, 20)?.to_ascii(&charset)?;
+    let frame = frame.resize(40, 20)?.to_charset(&charset)?;
 
     canvas.render(frame, Padding::Center);
 

@@ -42,7 +42,7 @@ fn main() -> Result<()> {
             let gif_iter = ReaderGif::new(args.path);
 
             for frame in gif_iter {
-                let frame = frame.resize(term_w, term_h)?.to_ascii(&charset)?;
+                let frame = frame.resize(term_w, term_h)?.to_charset(&charset)?;
 
                 canvas.render_clear_delay(frame, Padding::Center, 20);
             }
@@ -51,7 +51,7 @@ fn main() -> Result<()> {
             let charset = Charset::Ascii;
             let img = ReaderImage::new(args.path).read()?;
 
-            let frame = img.resize(term_w, term_h)?.to_ascii(&charset)?;
+            let frame = img.resize(term_w, term_h)?.to_charset(&charset)?;
 
             canvas.render(frame, Padding::Center);
         }
