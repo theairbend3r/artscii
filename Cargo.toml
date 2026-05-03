@@ -10,6 +10,9 @@ license = "GPL-3.0"
 keywords = ["ascii", "cli", "terminal"]
 categories = ["command-line-utilities", "multimedia"]
 
+[package.metadata.docs.rs]
+all-features = true
+
 [[bin]]
 name = "artscii"
 path = "src/bin/cli/main.rs"
