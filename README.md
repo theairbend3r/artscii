@@ -72,23 +72,26 @@ Following file formats are currently supported.
 | JPEG   |           |
 | JPG    |           |
 
+You can choose between different conversion character sets from default
+available `ascii` or `braille` to your custom string.
+
 ### As a CLI tool
 
 ```bash
-artscii --path path/to/file
+artscii --path path/to/file --charset ascii
 ```
 
 Options
 
 ```bash
-Usage: artscii [OPTIONS] --path <PATH>
+Usage: artscii [OPTIONS] --path <PATH> --charset <CHARSET>
 
 Options:
   -p, --path <PATH>
-  -v, --verbose...   Increase logging verbosity
-  -q, --quiet...     Decrease logging verbosity
-  -h, --help         Print help
-
+  -c, --charset <CHARSET>
+  -v, --verbose...         Increase logging verbosity
+  -q, --quiet...           Decrease logging verbosity
+  -h, --help               Print help
 ```
 
 ### As a library
@@ -100,17 +103,23 @@ use std::path::PathBuf;
 
 use artscii::core::{
     canvas::{Canvas, Padding},
-    decoder::{decoder::Decoder, image::ImageDecoder},
+    charset::Charset,
+    reader::image::ReaderImage,
 };
 
-fn main() {
+fn main() -> Result<(), Box<dyn std::error::Error>> {
     // load image from disk into a Frame
-    let path = PathBuf::from("./path/to/image");
-    let img_decoder = ImageDecoder::new(path).decode().unwrap();
-    let frame = img_decoder.resize(40, 20).to_ascii().unwrap();
-
-    // optionally load canvas to print
+    let path = PathBuf::from("./../test-images/cuddlyferris.png");
+    let reader = ReaderImage::new(path);
     let canvas = Canvas::new(210, 53);
+
+    let frame = reader.read()?;
+
+    let charset = Charset::new(vec!['⠀', '⠁', '⠃', ':', 'S', '⠏', '#', '⠿', '⡿', '⣿'])?;
+    let frame = frame.resize(40, 20)?.to_charset(&charset)?;
+
     canvas.render(frame, Padding::Center);
+
+    Ok(())
 }
 ```
