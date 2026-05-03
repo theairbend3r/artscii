@@ -64,7 +64,7 @@ impl Canvas {
         }
     }
 
-    pub fn render_with_delay(&self, frame: Ascii, padding: Padding, frames_per_second: u32) {
+    pub fn render_clear_delay(&self, frame: Ascii, padding: Padding, frames_per_second: u32) {
         print!("\x1b[H"); // move cursor to top-left
         io::stdout().flush().unwrap();
 

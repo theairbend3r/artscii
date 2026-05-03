@@ -17,6 +17,8 @@ use std::path::PathBuf;
 struct Args {
     #[arg(short, long)]
     path: PathBuf,
+    #[arg(short, long)]
+    charset: String,
     #[command(flatten)]
     verbose: Verbosity,
 }
@@ -31,29 +33,38 @@ fn main() -> Result<()> {
 
     info!("Starting up.");
 
+    // init canvas
     let (term_w, term_h) = utils::get_terminal_size();
     let canvas = Canvas::new(term_w, term_h);
+    info!("Initialise Canvas.");
 
+    // init charset for rendering
+    let charset: Charset = args.charset.parse().map_err(anyhow::Error::msg)?;
+    info!("Initialise Charset.");
+
+    // get file extension to pick a rendering method (single print vs animate)
     let file_extension = args.path.extension().and_then(|e| e.to_str());
 
     match file_extension {
         Some("gif") => {
-            let charset = Charset::Braille;
+            info!("Start rendering gif.");
+
             let gif_iter = ReaderGif::new(args.path);
-
             for frame in gif_iter {
-                let frame = frame.resize(term_w, term_h)?.to_ascii(&charset)?;
-
-                canvas.render_with_delay(frame, Padding::Center, 20);
+                let frame = frame.resize(term_w, term_h)?.to_charset(&charset)?;
+                canvas.render_clear_delay(frame, Padding::Center, 20);
             }
+
+            info!("Finish rendering gif.");
         }
         Some("png") | Some("jpg") | Some("jpeg") => {
-            let charset = Charset::Ascii;
+            info!("Start rendering image.");
+
             let img = ReaderImage::new(args.path).read()?;
-
-            let frame = img.resize(term_w, term_h)?.to_ascii(&charset)?;
-
+            let frame = img.resize(term_w, term_h)?.to_charset(&charset)?;
             canvas.render(frame, Padding::Center);
+
+            info!("Finish rendering image.");
         }
         Some(_) => {
             println!("Unsupported file type.");
