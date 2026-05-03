@@ -8,6 +8,7 @@ use artscii::core::charset::Charset;
 use artscii::core::reader::gif::ReaderGif;
 use artscii::core::reader::image::ReaderImage;
 use clap_verbosity_flag::Verbosity;
+// use std::str::FromStr;
 
 use clap::Parser;
 use log::info;
@@ -26,15 +27,6 @@ struct Args {
 fn main() -> Result<()> {
     let args = Args::parse();
 
-    let charset = if args.charset == "ascii" {
-        Charset::Ascii
-    } else if args.charset == "braille" {
-        Charset::Braille
-    } else {
-        let custom_chars = args.charset.chars().collect::<Vec<_>>();
-        Charset::new(custom_chars)?
-    };
-
     // init logger
     env_logger::Builder::new()
         .filter_level(args.verbose.log_level_filter())
@@ -42,9 +34,14 @@ fn main() -> Result<()> {
 
     info!("Starting up.");
 
+    // init canvas
     let (term_w, term_h) = utils::get_terminal_size();
     let canvas = Canvas::new(term_w, term_h);
 
+    // init charset for rendering
+    let charset: Charset = args.charset.parse().map_err(anyhow::Error::msg)?;
+
+    // get file extension to pick a rendering method (single print vs animate)
     let file_extension = args.path.extension().and_then(|e| e.to_str());
 
     match file_extension {
