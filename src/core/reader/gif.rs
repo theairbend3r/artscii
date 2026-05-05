@@ -1,5 +1,5 @@
+use image::AnimationDecoder;
 use image::codecs::gif::GifDecoder;
-use image::{AnimationDecoder, DynamicImage};
 use std::fs::File;
 use std::io::BufReader;
 use std::path::PathBuf;

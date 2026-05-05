@@ -74,19 +74,33 @@ impl Frame {
         })
     }
 
-    // pub fn gray(self) -> Result<Self> {
-    //     let mut gray = Vec::new();
-    //
-    //     for pixel in self.pixels {
-    //         let [r, g, b, _a] = pixel;
-    //         let y = (0.299 * r as f32 + 0.587 * g as f32 + 0.114 * b as f32) as u8;
-    //         gray.push(y)
-    //     }
-    //
-    //     let frame = Frame::new(gray, self.width, self.height, ColourStyle::Gray);
-    //
-    //     Ok(frame)
-    // }
+    pub fn gray(self) -> Result<Self> {
+        let mut gray = Vec::new();
+
+        match self.colourstyle {
+            ColourStyle::Rgba => {
+                for chunk in self.pixels.chunks_exact(4) {
+                    let [r, g, b] = [chunk[0], chunk[1], chunk[2]];
+                    let y = (0.299 * r as f32 + 0.587 * g as f32 + 0.114 * b as f32) as u8;
+                    gray.push(y)
+                }
+            }
+            ColourStyle::Rgb => {
+                for chunk in self.pixels.chunks_exact(3) {
+                    let [r, g, b] = [chunk[0], chunk[1], chunk[2]];
+                    let y = (0.299 * r as f32 + 0.587 * g as f32 + 0.114 * b as f32) as u8;
+                    gray.push(y)
+                }
+            }
+            _ => {
+                gray = self.pixels;
+            }
+        }
+
+        let frame = Frame::new(gray, self.width, self.height, ColourStyle::Gray);
+
+        Ok(frame)
+    }
 
     pub fn to_charset(self, charset: &Charset) -> Result<Ascii> {
         let mut ascii_frame: Vec<char> = Vec::with_capacity((self.width * self.height) as usize);
