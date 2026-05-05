@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // read and process frame
     let frame = reader.read()?;
-    let frame = frame.gray()?.resize(40, 20)?.to_charset(&charset)?;
+    let frame = frame.resize(40, 20)?.gray()?.to_charset(&charset)?;
     println!("{:?}", frame);
 
     // render frame

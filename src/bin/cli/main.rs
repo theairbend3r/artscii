@@ -51,7 +51,7 @@ fn main() -> Result<()> {
 
             let gif_iter = ReaderGif::new(args.path);
             for frame in gif_iter {
-                let frame = frame.resize(term_w, term_h)?.to_charset(&charset)?;
+                let frame = frame.gray()?.resize(term_w, term_h)?.to_charset(&charset)?;
                 canvas.render_clear_delay(frame, Padding::Center, 20);
             }
 
@@ -61,7 +61,7 @@ fn main() -> Result<()> {
             info!("Start rendering image.");
 
             let img = ReaderImage::new(args.path).read()?;
-            let frame = img.resize(term_w, term_h)?.to_charset(&charset)?;
+            let frame = img.gray()?.resize(term_w, term_h)?.to_charset(&charset)?;
             canvas.render(frame, Padding::Center);
 
             info!("Finish rendering image.");

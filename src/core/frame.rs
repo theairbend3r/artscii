@@ -49,8 +49,14 @@ impl Frame {
             bail!("target_width or target_height cannot be 0.")
         }
 
+        let bytes_per_pixel: u32 = match self.colourstyle {
+            ColourStyle::Gray => 1,
+            ColourStyle::Rgb => 3,
+            ColourStyle::Rgba => 4,
+        };
+
         let mut resized_frame: Vec<u8> =
-            Vec::with_capacity((target_width * target_height) as usize);
+            Vec::with_capacity((target_width * target_height * bytes_per_pixel) as usize);
 
         let x_ratio = self.width as f32 / target_width as f32;
         let y_ratio = self.height as f32 / target_height as f32;
@@ -60,9 +66,10 @@ impl Frame {
                 let x_old = (x_new as f32 * x_ratio).floor() as u32;
                 let y_old = (y_new as f32 * y_ratio).floor() as u32;
 
-                let idx_old = (y_old * self.width + x_old) as usize;
+                let idx_old = ((y_old * self.width + x_old) * bytes_per_pixel) as usize;
 
-                resized_frame.push(self.pixels[idx_old]);
+                resized_frame
+                    .extend_from_slice(&self.pixels[idx_old..idx_old + bytes_per_pixel as usize]);
             }
         }
 
@@ -80,7 +87,7 @@ impl Frame {
         match self.colourstyle {
             ColourStyle::Rgba => {
                 for chunk in self.pixels.chunks_exact(4) {
-                    let [r, g, b] = [chunk[0], chunk[1], chunk[2]];
+                    let [r, g, b, _a] = [chunk[0], chunk[1], chunk[2], chunk[3]];
                     let y = (0.299 * r as f32 + 0.587 * g as f32 + 0.114 * b as f32) as u8;
                     gray.push(y)
                 }
@@ -92,7 +99,7 @@ impl Frame {
                     gray.push(y)
                 }
             }
-            _ => {
+            ColourStyle::Gray => {
                 gray = self.pixels;
             }
         }
