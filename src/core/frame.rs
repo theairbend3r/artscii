@@ -13,10 +13,18 @@ pub fn brightness_to_ascii_char(brightness: u8, charset: &Charset) -> Result<cha
 }
 
 #[derive(Debug)]
+pub enum ColourStyle {
+    Rgba,
+    Rgb,
+    Gray,
+}
+
+#[derive(Debug)]
 pub struct Frame {
     pub pixels: Vec<u8>,
     pub width: u32,
     pub height: u32,
+    pub colourstyle: ColourStyle,
 }
 
 #[derive(Debug)]
@@ -27,11 +35,12 @@ pub struct Ascii {
 }
 
 impl Frame {
-    pub fn new(pixels: Vec<u8>, width: u32, height: u32) -> Self {
+    pub fn new(pixels: Vec<u8>, width: u32, height: u32, colourstyle: ColourStyle) -> Self {
         Self {
             pixels,
             width,
             height,
+            colourstyle,
         }
     }
 
@@ -61,8 +70,23 @@ impl Frame {
             pixels: resized_frame,
             width: target_width,
             height: target_height,
+            colourstyle: self.colourstyle,
         })
     }
+
+    // pub fn gray(self) -> Result<Self> {
+    //     let mut gray = Vec::new();
+    //
+    //     for pixel in self.pixels {
+    //         let [r, g, b, _a] = pixel;
+    //         let y = (0.299 * r as f32 + 0.587 * g as f32 + 0.114 * b as f32) as u8;
+    //         gray.push(y)
+    //     }
+    //
+    //     let frame = Frame::new(gray, self.width, self.height, ColourStyle::Gray);
+    //
+    //     Ok(frame)
+    // }
 
     pub fn to_charset(self, charset: &Charset) -> Result<Ascii> {
         let mut ascii_frame: Vec<char> = Vec::with_capacity((self.width * self.height) as usize);
