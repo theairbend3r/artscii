@@ -4,7 +4,7 @@ use std::{
     time::Duration,
 };
 
-use crate::core::frame::Ascii;
+use crate::core::frame::Frame;
 
 pub struct Canvas {
     pub width: u32,
@@ -29,7 +29,7 @@ impl Canvas {
         (pad_left, pad_top)
     }
 
-    pub fn render(&self, frame: Ascii, padding: Padding) {
+    pub fn render(&self, frame: Frame, padding: Padding) {
         // calculate pad values
         let (pad_left, pad_top) = match padding {
             Padding::None => (0, 0),
@@ -50,7 +50,7 @@ impl Canvas {
             // print pixels
             for col in 0..frame.width {
                 let idx = (row * frame.width + col) as usize;
-                let px = frame.pixels[idx];
+                let px = &frame.ascii[idx];
                 print!("{}", px);
             }
 
@@ -64,7 +64,7 @@ impl Canvas {
         }
     }
 
-    pub fn render_clear_delay(&self, frame: Ascii, padding: Padding, frames_per_second: u32) {
+    pub fn render_clear_delay(&self, frame: Frame, padding: Padding, frames_per_second: u32) {
         print!("\x1b[H"); // move cursor to top-left
         io::stdout().flush().unwrap();
 
