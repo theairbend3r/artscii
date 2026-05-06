@@ -5,6 +5,7 @@ mod utils;
 use anyhow::{Result, bail};
 use artscii::core::canvas::{Canvas, Padding};
 use artscii::core::charset::Charset;
+use artscii::core::frame::ColourStyle;
 use artscii::core::reader::gif::ReaderGif;
 use artscii::core::reader::image::ReaderImage;
 use clap_verbosity_flag::Verbosity;
@@ -15,10 +16,12 @@ use std::path::PathBuf;
 
 #[derive(Parser, Debug)]
 struct Args {
-    #[arg(short, long)]
+    #[arg(long)]
     path: PathBuf,
-    #[arg(short, long)]
+    #[arg(long)]
     charset: String,
+    #[arg(long)]
+    colourstyle: String,
     #[command(flatten)]
     verbose: Verbosity,
 }
@@ -42,6 +45,10 @@ fn main() -> Result<()> {
     let charset: Charset = args.charset.parse().map_err(anyhow::Error::msg)?;
     info!("Initialise Charset.");
 
+    // init colourstyle for rendering
+    let colourstyle: ColourStyle = args.colourstyle.parse().map_err(anyhow::Error::msg)?;
+    info!("Initialise ColourStyle.");
+
     // get file extension to pick a rendering method (single print vs animate)
     let file_extension = args.path.extension().and_then(|e| e.to_str());
 
@@ -51,7 +58,14 @@ fn main() -> Result<()> {
 
             let gif_iter = ReaderGif::new(args.path);
             for frame in gif_iter {
-                let frame = frame.resize(term_w, term_h)?.create_ascii(&charset)?;
+                let mut frame = frame.resize(term_w, term_h)?;
+
+                if let ColourStyle::Gray = colourstyle {
+                    frame = frame.gray()?;
+                }
+
+                frame = frame.create_ascii(&charset)?;
+
                 canvas.render_clear_delay(frame, Padding::Center, 20);
             }
 
@@ -61,7 +75,13 @@ fn main() -> Result<()> {
             info!("Start rendering image.");
 
             let img = ReaderImage::new(args.path).read()?;
-            let frame = img.resize(term_w, term_h)?.create_ascii(&charset)?;
+            let mut frame = img.resize(term_w, term_h)?;
+
+            if let ColourStyle::Gray = colourstyle {
+                frame = frame.gray()?;
+            }
+
+            frame = frame.create_ascii(&charset)?;
             canvas.render(frame, Padding::Center);
 
             info!("Finish rendering image.");
