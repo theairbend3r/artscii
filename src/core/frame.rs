@@ -85,8 +85,8 @@ impl Frame {
         let scale_h = target_height as f32 / self.height as f32;
         let scale = scale_w.min(scale_h);
 
-        let target_width = (self.width as f32 * scale).round() as u32;
-        let target_height = (self.height as f32 * scale).round() as u32 / 2;
+        let target_width = (self.width as f32 * scale).round() as u32 * 2;
+        let target_height = (self.height as f32 * scale).round() as u32;
 
         let bytes_per_pixel: u32 = match self.colourstyle {
             ColourStyle::Gray => 1,
