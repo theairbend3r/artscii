@@ -66,7 +66,9 @@ fn main() -> Result<()> {
 
                 frame = frame.create_ascii(&charset)?;
 
-                canvas.render_clear_delay(frame, Padding::Center, 20);
+                canvas.clear();
+                canvas.render(frame, Padding::Center);
+                canvas.delay(20);
             }
 
             info!("Finish rendering gif.");
