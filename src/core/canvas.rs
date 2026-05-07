@@ -17,8 +17,20 @@ pub enum Padding {
     Custom(u32, u32),
 }
 
+impl Drop for Canvas {
+    fn drop(&mut self) {
+        // leave alternate screen
+        print!("\x1b[?1049l");
+        io::stdout().flush().unwrap();
+    }
+}
+
 impl Canvas {
     pub fn new(width: u32, height: u32) -> Self {
+        // enter alternate screen
+        // alternate screen is exited when Canvas is dropped
+        print!("\x1b[?1049h");
+
         Self { width, height }
     }
 
@@ -62,15 +74,15 @@ impl Canvas {
         for _ in 0..pad_top {
             println!();
         }
+        io::stdout().flush().unwrap();
     }
 
-    pub fn render_clear_delay(&self, frame: Frame, padding: Padding, frames_per_second: u32) {
+    pub fn clear(&self) {
         print!("\x1b[H"); // move cursor to top-left
         io::stdout().flush().unwrap();
+    }
 
-        self.render(frame, padding);
-
-        io::stdout().flush().unwrap();
+    pub fn delay(&self, frames_per_second: u32) {
         thread::sleep(Duration::from_secs_f32(1.0 / frames_per_second as f32));
     }
 }
