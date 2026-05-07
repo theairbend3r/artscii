@@ -80,6 +80,14 @@ impl Frame {
             bail!("target_width or target_height cannot be 0.")
         }
 
+        // aspect aware resizing
+        let scale_w = target_width as f32 / self.width as f32;
+        let scale_h = target_height as f32 / self.height as f32;
+        let scale = scale_w.min(scale_h);
+
+        let target_width = (self.width as f32 * scale).round() as u32;
+        let target_height = (self.height as f32 * scale).round() as u32 / 2;
+
         let bytes_per_pixel: u32 = match self.colourstyle {
             ColourStyle::Gray => 1,
             ColourStyle::Rgb => 3,
