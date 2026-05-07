@@ -17,13 +17,13 @@ pub enum Padding {
     Custom(u32, u32),
 }
 
-impl Drop for Canvas {
-    fn drop(&mut self) {
-        // leave alternate screen
-        print!("\x1b[?1049l");
-        io::stdout().flush().unwrap();
-    }
-}
+// impl Drop for Canvas {
+//     fn drop(&mut self) {
+//         // leave alternate screen
+//         print!("\x1b[?1049l");
+//         io::stdout().flush().unwrap();
+//     }
+// }
 
 impl Canvas {
     pub fn new(width: u32, height: u32) -> Self {

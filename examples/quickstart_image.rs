@@ -17,7 +17,7 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 
     // read and process frame
     let frame = reader.read()?;
-    let frame = frame.resize(40, 20)?.create_ascii(&charset)?;
+    let frame = frame.resize(80, 40)?.create_ascii(&charset)?;
 
     // render frame
     canvas.render(frame, Padding::Center);
