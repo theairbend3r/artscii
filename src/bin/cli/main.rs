@@ -2,10 +2,10 @@
 
 mod utils;
 
-use anyhow::{Result, bail};
+use anyhow::Result;
 use artscii::core::canvas::{Canvas, Padding};
 use artscii::core::charset::Charset;
-use artscii::core::frame::ColourStyle;
+use artscii::core::colourstyle::ColourStyle;
 use artscii::core::reader::gif::ReaderGif;
 use artscii::core::reader::image::ReaderImage;
 use clap_verbosity_flag::Verbosity;

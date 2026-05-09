@@ -4,7 +4,8 @@ use std::fs::File;
 use std::io::BufReader;
 use std::path::PathBuf;
 
-use crate::core::frame::{ColourStyle, Frame};
+use crate::core::colourstyle::ColourStyle;
+use crate::core::frame::Frame;
 
 pub struct ReaderGif<'a> {
     inner: image::Frames<'a>,
