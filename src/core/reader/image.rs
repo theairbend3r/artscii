@@ -2,7 +2,7 @@ use std::path::PathBuf;
 
 use image::{DynamicImage, GenericImageView, ImageReader};
 
-use crate::core::frame::{ColourStyle, Frame};
+use crate::core::{colourstyle::ColourStyle, frame::Frame};
 
 #[derive(Debug)]
 pub struct ReaderImage {

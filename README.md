@@ -72,8 +72,8 @@ Following file formats are currently supported.
 | JPEG   |           |
 | JPG    |           |
 
-You can choose between different conversion character sets from default
-available `ascii` or `braille` to your custom string.
+You can choose between different conversion character sets. From the default
+available `ascii, braille` to your own custom string.
 
 ### As a CLI tool
 
